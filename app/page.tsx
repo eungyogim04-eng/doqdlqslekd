@@ -109,7 +109,7 @@ export default function LandingPage() {
           </div>
           <nav className="hidden sm:flex items-center gap-6 text-sm text-zinc-500">
             <a href="#features" className="hover:text-zinc-900 transition-colors">기능</a>
-            <a href="#pricing" className="hover:text-zinc-900 transition-colors">가격</a>
+            <Link href="/pricing" className="hover:text-zinc-900 transition-colors">가격</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/auth" className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors">
