@@ -27,6 +27,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [editingPost, setEditingPost] = useState<ScheduledPost | null>(null);
+  const [userPlan, setUserPlan] = useState<"free" | "pro" | "business">("free");
+
+  const PLAN_LIMITS = {
+    free: { posts: 10, platforms: ["instagram", "twitter"] },
+    pro: { posts: 100, platforms: ["instagram", "twitter", "youtube"] },
+    business: { posts: Infinity, platforms: ["instagram", "twitter", "youtube"] },
+  };
 
   const today = now.toISOString().split("T")[0];
   const currentMonth = `${year}-${String(month + 1).padStart(2, "0")}`;
@@ -51,6 +58,14 @@ export default function Home() {
 
     return () => listener.subscription.unsubscribe();
   }, [router]);
+
+  // Load user plan
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_plans").select("plan").eq("user_id", user.id).single().then(({ data }) => {
+      if (data?.plan) setUserPlan(data.plan as "free" | "pro" | "business");
+    });
+  }, [user]);
 
   // Load posts from Supabase
   useEffect(() => {
@@ -104,6 +119,20 @@ export default function Home() {
   }
 
   async function handleAddPost(post: ScheduledPost) {
+    const limit = PLAN_LIMITS[userPlan];
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const monthPosts = posts.filter((p) => p.scheduledAt.startsWith(thisMonth));
+
+    if (monthPosts.length >= limit.posts) {
+      alert(`${userPlan === "free" ? "Free" : "Pro"} 플랜은 월 ${limit.posts}개까지 예약 가능합니다.\n업그레이드하려면 /pricing 페이지를 방문하세요!`);
+      return;
+    }
+
+    if (!limit.platforms.includes(post.platform)) {
+      alert(`Free 플랜은 Instagram, Twitter만 사용 가능합니다.\nYouTube를 사용하려면 Pro 플랜으로 업그레이드하세요!`);
+      return;
+    }
+
     const { data, error } = await supabase
       .from("posts")
       .insert({
@@ -190,9 +219,16 @@ export default function Home() {
             >
               로그아웃
             </button>
-            <button className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-              업그레이드
-            </button>
+            {userPlan === "free" && (
+              <Link href="/pricing" className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+                업그레이드 ✨
+              </Link>
+            )}
+            {userPlan !== "free" && (
+              <span className="rounded-xl bg-indigo-100 px-4 py-1.5 text-sm font-semibold text-indigo-700 capitalize">
+                {userPlan} 플랜 ✓
+              </span>
+            )}
           </div>
         </div>
       </header>
