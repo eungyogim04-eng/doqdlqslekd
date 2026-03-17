@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Calendar from "./components/Calendar";
 import StatsCards from "./components/StatsCards";
 import PostForm from "./components/PostForm";
@@ -151,8 +152,8 @@ export default function Home() {
           </div>
 
           <nav className="flex items-center gap-1 text-sm">
-            <button className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50">캘린더</button>
-            <button className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">분석</button>
+            <Link href="/" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50">캘린더</Link>
+            <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">분석</Link>
             <button className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">설정</button>
           </nav>
 
