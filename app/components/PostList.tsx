@@ -65,6 +65,9 @@ export default function PostList({
                   <p className="text-sm text-zinc-700 break-words">
                     {post.content}
                   </p>
+                  {post.imageUrl && (
+                    <img src={post.imageUrl} alt="" className="mt-2 rounded-lg w-full h-28 object-cover border border-zinc-100" />
+                  )}
                 </div>
                 <div className="flex flex-col gap-1 shrink-0">
                   <button

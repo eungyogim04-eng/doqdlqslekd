@@ -71,6 +71,7 @@ export default function Home() {
           scheduledAt: row.scheduled_at,
           time: row.time,
           createdAt: row.created_at,
+          imageUrl: row.image_url ?? undefined,
         }));
         setPosts(mapped);
       }
@@ -111,6 +112,7 @@ export default function Home() {
         scheduled_at: post.scheduledAt,
         time: post.time,
         user_id: user!.id,
+        image_url: post.imageUrl ?? null,
       })
       .select()
       .single();

@@ -7,6 +7,7 @@ export interface ScheduledPost {
   scheduledAt: string; // ISO date string YYYY-MM-DD
   time: string; // HH:MM
   createdAt: string;
+  imageUrl?: string;
 }
 
 export const PLATFORM_CONFIG: Record<

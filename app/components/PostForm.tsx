@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Platform, ScheduledPost, PLATFORM_CONFIG } from "../types";
+import { supabase } from "../../lib/supabase";
 
 interface PostFormProps {
   defaultDate?: string;
@@ -17,6 +18,10 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   const [error, setError] = useState("");
   const [topic, setTopic] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAiGenerate() {
     if (!topic.trim()) {
@@ -45,15 +50,44 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setError("이미지는 5MB 이하만 가능해요."); return; }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setError("");
+  }
+
+  function removeImage() {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!content.trim()) {
-      setError("내용을 입력해 주세요.");
-      return;
-    }
-    if (!date) {
-      setError("날짜를 선택해 주세요.");
-      return;
+    if (!content.trim()) { setError("내용을 입력해 주세요."); return; }
+    if (!date) { setError("날짜를 선택해 주세요."); return; }
+
+    let imageUrl: string | undefined;
+
+    if (imageFile) {
+      setImageUploading(true);
+      const ext = imageFile.name.split(".").pop();
+      const path = `posts/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(path, imageFile);
+
+      if (uploadError) {
+        setError("이미지 업로드에 실패했어요.");
+        setImageUploading(false);
+        return;
+      }
+      const { data } = supabase.storage.from("post-images").getPublicUrl(path);
+      imageUrl = data.publicUrl;
+      setImageUploading(false);
     }
 
     const post: ScheduledPost = {
@@ -63,11 +97,13 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       scheduledAt: date,
       time,
       createdAt: new Date().toISOString(),
+      imageUrl,
     };
 
     onAdd(post);
     setContent("");
     setError("");
+    removeImage();
   }
 
   return (
@@ -151,6 +187,42 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
 
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
+      {/* Image upload */}
+      <div className="mt-3">
+        {imagePreview ? (
+          <div className="relative rounded-xl overflow-hidden border border-zinc-200">
+            <img src={imagePreview} alt="preview" className="w-full h-36 object-cover" />
+            <button
+              type="button"
+              onClick={removeImage}
+              className="absolute top-2 right-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/70 transition-colors"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full rounded-xl border border-dashed border-zinc-300 bg-zinc-50 py-3 text-xs text-zinc-400 hover:border-indigo-300 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 21h18M5.25 6.75h.008v.008H5.25V6.75zm0 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
+            </svg>
+            이미지 첨부 (선택, 최대 5MB)
+          </button>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="hidden"
+        />
+      </div>
+
       {/* Date & time */}
       <div className="mt-3 flex gap-3">
         <div className="flex-1">
@@ -175,9 +247,10 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
 
       <button
         type="submit"
-        className="mt-4 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors"
+        disabled={imageUploading}
+        className="mt-4 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:opacity-60"
       >
-        예약 등록
+        {imageUploading ? "이미지 업로드 중..." : "예약 등록"}
       </button>
     </form>
   );
