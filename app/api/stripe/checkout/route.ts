@@ -1,28 +1,25 @@
-import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-  const { plan, userId, userEmail } = await req.json();
+  try {
+    const { priceId, userId, userEmail } = await req.json();
 
-  const prices: Record<string, string> = {
-    pro: process.env.STRIPE_PRO_PRICE_ID!,
-    business: process.env.STRIPE_BUSINESS_PRICE_ID!,
-  };
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      customer_email: userEmail,
+      metadata: { userId },
+    });
 
-  if (!prices[plan]) {
-    return NextResponse.json({ error: "잘못된 플랜입니다." }, { status: 400 });
+    return NextResponse.json({ url: session.url });
+  } catch (error) {
+    console.error("Stripe checkout error:", error);
+    return NextResponse.json({ error: "결제 세션 생성 실패" }, { status: 500 });
   }
-
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    payment_method_types: ["card"],
-    customer_email: userEmail,
-    line_items: [{ price: prices[plan], quantity: 1 }],
-    metadata: { userId, plan },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?upgraded=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
-  });
-
-  return NextResponse.json({ url: session.url });
 }
