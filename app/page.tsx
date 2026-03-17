@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Calendar from "./components/Calendar";
 import StatsCards from "./components/StatsCards";
 import PostForm from "./components/PostForm";
 import PostList from "./components/PostList";
 import { ScheduledPost } from "./types";
 import { supabase } from "../lib/supabase";
+import type { User } from "@supabase/supabase-js";
 
 const MONTH_NAMES = [
   "1월", "2월", "3월", "4월", "5월", "6월",
@@ -14,23 +16,48 @@ const MONTH_NAMES = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [posts, setPosts] = useState<ScheduledPost[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
   const today = now.toISOString().split("T")[0];
   const currentMonth = `${year}-${String(month + 1).padStart(2, "0")}`;
 
+  // Auth check
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        router.push("/auth");
+      } else {
+        setUser(data.user);
+      }
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.push("/auth");
+      } else {
+        setUser(session.user);
+      }
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, [router]);
+
   // Load posts from Supabase
   useEffect(() => {
+    if (!user) return;
     async function fetchPosts() {
       setLoading(true);
       const { data, error } = await supabase
         .from("posts")
         .select("*")
+        .eq("user_id", user!.id)
         .order("scheduled_at", { ascending: true });
 
       if (!error && data) {
@@ -47,7 +74,12 @@ export default function Home() {
       setLoading(false);
     }
     fetchPosts();
-  }, []);
+  }, [user]);
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/auth");
+  }
 
   function prevMonth() {
     if (month === 0) { setYear((y) => y - 1); setMonth(11); }
@@ -75,6 +107,7 @@ export default function Home() {
         platform: post.platform,
         scheduled_at: post.scheduledAt,
         time: post.time,
+        user_id: user!.id,
       })
       .select()
       .single();
@@ -123,9 +156,22 @@ export default function Home() {
             <button className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">설정</button>
           </nav>
 
-          <button className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-            업그레이드
-          </button>
+          <div className="flex items-center gap-3">
+            {user && (
+              <span className="hidden sm:block text-xs text-zinc-500 truncate max-w-[140px]">
+                {user.email}
+              </span>
+            )}
+            <button
+              onClick={handleLogout}
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-1.5 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              로그아웃
+            </button>
+            <button className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+              업그레이드
+            </button>
+          </div>
         </div>
       </header>
 
