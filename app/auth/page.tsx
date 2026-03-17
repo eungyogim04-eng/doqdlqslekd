@@ -24,7 +24,7 @@ export default function AuthPage() {
       if (error) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } else {
       const { error } = await supabase.auth.signUp({ email, password });
