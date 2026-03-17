@@ -6,6 +6,7 @@ interface PostListProps {
   posts: ScheduledPost[];
   selectedDate: string | null;
   onDelete: (id: string) => void;
+  onEdit: (post: ScheduledPost) => void;
   onClose: () => void;
 }
 
@@ -13,6 +14,7 @@ export default function PostList({
   posts,
   selectedDate,
   onDelete,
+  onEdit,
   onClose,
 }: PostListProps) {
   if (!selectedDate) return null;
@@ -64,12 +66,20 @@ export default function PostList({
                     {post.content}
                   </p>
                 </div>
-                <button
-                  onClick={() => onDelete(post.id)}
-                  className="shrink-0 text-xs text-zinc-400 hover:text-red-500 transition-colors"
-                >
-                  삭제
-                </button>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    onClick={() => onEdit(post)}
+                    className="text-xs text-zinc-400 hover:text-indigo-500 transition-colors"
+                  >
+                    편집
+                  </button>
+                  <button
+                    onClick={() => onDelete(post.id)}
+                    className="text-xs text-zinc-400 hover:text-red-500 transition-colors"
+                  >
+                    삭제
+                  </button>
+                </div>
               </li>
             );
           })}

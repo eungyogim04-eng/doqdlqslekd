@@ -7,6 +7,7 @@ import Calendar from "../components/Calendar";
 import StatsCards from "../components/StatsCards";
 import PostForm from "../components/PostForm";
 import PostList from "../components/PostList";
+import EditPostModal from "../components/EditPostModal";
 import { ScheduledPost } from "../types";
 import { supabase } from "../../lib/supabase";
 import type { User } from "@supabase/supabase-js";
@@ -25,6 +26,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [editingPost, setEditingPost] = useState<ScheduledPost | null>(null);
 
   const today = now.toISOString().split("T")[0];
   const currentMonth = `${year}-${String(month + 1).padStart(2, "0")}`;
@@ -127,6 +129,23 @@ export default function Home() {
     }
   }
 
+  async function handleUpdatePost(updated: ScheduledPost) {
+    const { error } = await supabase
+      .from("posts")
+      .update({
+        content: updated.content,
+        platform: updated.platform,
+        scheduled_at: updated.scheduledAt,
+        time: updated.time,
+      })
+      .eq("id", updated.id);
+
+    if (!error) {
+      setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+      setSelectedDate(updated.scheduledAt);
+    }
+  }
+
   async function handleDeletePost(id: string) {
     const { error } = await supabase.from("posts").delete().eq("id", id);
     if (!error) {
@@ -211,6 +230,7 @@ export default function Home() {
                     posts={posts}
                     selectedDate={selectedDate}
                     onDelete={handleDeletePost}
+                    onEdit={(post) => setEditingPost(post)}
                     onClose={() => setSelectedDate(null)}
                   />
                 )}
@@ -223,6 +243,11 @@ export default function Home() {
           </>
         )}
       </main>
+      <EditPostModal
+        post={editingPost}
+        onClose={() => setEditingPost(null)}
+        onSave={handleUpdatePost}
+      />
     </div>
   );
 }
