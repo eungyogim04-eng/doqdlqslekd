@@ -28,6 +28,8 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [editingPost, setEditingPost] = useState<ScheduledPost | null>(null);
   const [userPlan, setUserPlan] = useState<"free" | "pro" | "business">("free");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
   const PLAN_LIMITS = {
     free: { posts: 10, platforms: ["instagram", "twitter"] },
@@ -250,6 +252,17 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Search toggle button */}
+            <button
+              onClick={() => { setShowSearch((v) => !v); setSearchQuery(""); }}
+              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${showSearch ? "border-indigo-300 bg-indigo-50 text-indigo-600" : "border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50"}`}
+              title="검색"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
             {user && (
               <span className="hidden sm:block text-xs text-zinc-500 truncate max-w-[140px]">
                 {user.email}
@@ -275,6 +288,36 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Search bar */}
+      {showSearch && (
+        <div className="border-b border-zinc-200 bg-white px-4 py-3 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                autoFocus
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="포스트 내용, 플랫폼으로 검색..."
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-4 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         {loading ? (
           <div className="flex items-center justify-center py-32">
@@ -283,6 +326,79 @@ export default function Home() {
         ) : (
           <>
             <StatsCards posts={posts} today={today} currentMonth={currentMonth} />
+
+            {/* Search results */}
+            {showSearch && searchQuery.trim() && (() => {
+              const q = searchQuery.trim().toLowerCase();
+              const results = posts.filter(
+                (p) =>
+                  p.content.toLowerCase().includes(q) ||
+                  p.platform.toLowerCase().includes(q)
+              );
+              return (
+                <div className="mt-6 rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
+                    <h3 className="text-sm font-semibold text-zinc-800">
+                      검색 결과 <span className="text-indigo-600">&ldquo;{searchQuery}&rdquo;</span>
+                      <span className="ml-2 text-xs font-normal text-zinc-400">{results.length}개</span>
+                    </h3>
+                  </div>
+                  {results.length === 0 ? (
+                    <p className="px-5 py-8 text-center text-sm text-zinc-400">검색 결과가 없습니다.</p>
+                  ) : (
+                    <ul className="divide-y divide-zinc-100">
+                      {results.map((post) => {
+                        const platformColors: Record<string, string> = {
+                          instagram: "text-pink-500",
+                          twitter: "text-sky-500",
+                          youtube: "text-red-500",
+                        };
+                        const platformLabels: Record<string, string> = {
+                          instagram: "Instagram",
+                          twitter: "Twitter/X",
+                          youtube: "YouTube",
+                        };
+                        const highlighted = post.content.replace(
+                          new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"),
+                          "<mark class=\"bg-yellow-100 text-yellow-800 rounded px-0.5\">$1</mark>"
+                        );
+                        return (
+                          <li
+                            key={post.id}
+                            className="flex items-start gap-3 px-5 py-4 hover:bg-zinc-50 cursor-pointer transition-colors"
+                            onClick={() => {
+                              setSelectedDate(post.scheduledAt);
+                              // navigate calendar to the post's month
+                              const [y, m] = post.scheduledAt.split("-").map(Number);
+                              setYear(y);
+                              setMonth(m - 1);
+                              setShowSearch(false);
+                              setSearchQuery("");
+                            }}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className={`text-xs font-semibold ${platformColors[post.platform] ?? "text-zinc-500"}`}>
+                                  {platformLabels[post.platform] ?? post.platform}
+                                </span>
+                                <span className="text-xs text-zinc-400">{post.scheduledAt} {post.time}</span>
+                              </div>
+                              <p
+                                className="text-sm text-zinc-700 break-words"
+                                dangerouslySetInnerHTML={{ __html: highlighted }}
+                              />
+                            </div>
+                            <svg className="h-4 w-4 shrink-0 mt-1 text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path d="M9 18l6-6-6-6" />
+                            </svg>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="mt-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
