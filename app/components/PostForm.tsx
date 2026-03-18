@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Platform, ScheduledPost, PLATFORM_CONFIG } from "../types";
 import { supabase } from "../../lib/supabase";
+import LinkPreview from "./LinkPreview";
 
 interface PostFormProps {
   defaultDate?: string;
@@ -254,6 +255,9 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       />
 
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
+      {/* 링크 미리보기 */}
+      <LinkPreview content={content} />
 
       {/* 해시태그 추천 */}
       <div className="mt-2">
