@@ -8,6 +8,8 @@ import StatsCards from "../components/StatsCards";
 import PostForm from "../components/PostForm";
 import PostList from "../components/PostList";
 import EditPostModal from "../components/EditPostModal";
+import WeekView from "../components/WeekView";
+import DayView from "../components/DayView";
 import { ScheduledPost } from "../types";
 import { supabase } from "../../lib/supabase";
 import { useDarkMode } from "../components/ThemeProvider";
@@ -31,6 +33,7 @@ export default function Home() {
   const [userPlan, setUserPlan] = useState<"free" | "pro" | "business">("free");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [calView, setCalView] = useState<"month" | "week" | "day">("month");
   const { dark, toggle: toggleDark } = useDarkMode();
 
   const PLAN_LIMITS = {
@@ -428,19 +431,56 @@ export default function Home() {
                 <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{year}년 {MONTH_NAMES[month]}</h2>
                 <button onClick={nextMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">›</button>
               </div>
-              <button onClick={goToday} className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">오늘</button>
+              <div className="flex items-center gap-2">
+                {/* View tabs */}
+                <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+                  {(["month", "week", "day"] as const).map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setCalView(v)}
+                      className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                        calView === v
+                          ? "bg-indigo-600 text-white"
+                          : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
+                      }`}
+                    >
+                      {v === "month" ? "월" : v === "week" ? "주" : "일"}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={goToday} className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">오늘</button>
+              </div>
             </div>
 
             <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
               <div className="lg:col-span-2">
-                <Calendar
-                  year={year}
-                  month={month}
-                  posts={posts}
-                  today={today}
-                  onDayClick={(d) => setSelectedDate((prev) => (prev === d ? null : d))}
-                  onMovePost={handleMovePost}
-                />
+                {calView === "month" && (
+                  <Calendar
+                    year={year}
+                    month={month}
+                    posts={posts}
+                    today={today}
+                    onDayClick={(d) => setSelectedDate((prev) => (prev === d ? null : d))}
+                    onMovePost={handleMovePost}
+                  />
+                )}
+                {calView === "week" && (
+                  <WeekView
+                    baseDate={selectedDate ?? today}
+                    posts={posts}
+                    today={today}
+                    onDayClick={(d) => { setSelectedDate(d); setCalView("day"); }}
+                  />
+                )}
+                {calView === "day" && (
+                  <DayView
+                    date={selectedDate ?? today}
+                    posts={posts}
+                    onEdit={(post) => setEditingPost(post)}
+                    onDelete={handleDeletePost}
+                    onDuplicate={handleDuplicatePost}
+                  />
+                )}
               </div>
 
               <div className="flex flex-col gap-4">
