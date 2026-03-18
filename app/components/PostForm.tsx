@@ -22,6 +22,8 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
   const [repeat, setRepeat] = useState<"none" | "daily" | "weekly" | "monthly">("none");
+  const [hashtags, setHashtags] = useState<string[]>([]);
+  const [hashtagLoading, setHashtagLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAiGenerate() {
@@ -58,6 +60,29 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
     setError("");
+  }
+
+  async function handleHashtagSuggest() {
+    if (!content.trim()) { setError("먼저 포스트 내용을 입력해주세요."); return; }
+    setHashtagLoading(true);
+    try {
+      const res = await fetch("/api/hashtags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: content.trim(), platform }),
+      });
+      const data = await res.json();
+      if (data.hashtags) setHashtags(data.hashtags);
+    } catch {
+      setError("해시태그 추천 실패. 다시 시도해주세요.");
+    } finally {
+      setHashtagLoading(false);
+    }
+  }
+
+  function addHashtag(tag: string) {
+    setContent((prev) => prev.trim() + " " + tag);
+    setHashtags((prev) => prev.filter((t) => t !== tag));
   }
 
   function removeImage() {
@@ -204,6 +229,38 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       />
 
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
+      {/* 해시태그 추천 */}
+      <div className="mt-2">
+        <button
+          type="button"
+          onClick={handleHashtagSuggest}
+          disabled={hashtagLoading}
+          className="text-xs text-indigo-500 hover:text-indigo-700 font-medium flex items-center gap-1 disabled:opacity-50"
+        >
+          {hashtagLoading ? (
+            <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          ) : "# "}
+          {hashtagLoading ? "해시태그 추천 중..." : "AI 해시태그 추천"}
+        </button>
+        {hashtags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {hashtags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => addHashtag(tag)}
+                className="rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-1 text-xs text-indigo-600 hover:bg-indigo-100 transition-colors"
+              >
+                {tag} +
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Image upload */}
       <div className="mt-3">
