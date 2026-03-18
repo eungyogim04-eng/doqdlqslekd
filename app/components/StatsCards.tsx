@@ -1,22 +1,36 @@
 "use client";
 
+import Link from "next/link";
 import { ScheduledPost, PLATFORM_CONFIG } from "../types";
 
 interface StatsCardsProps {
   posts: ScheduledPost[];
   today: string;
   currentMonth: string; // YYYY-MM
+  userPlan: "free" | "pro" | "business";
 }
+
+const PLAN_LIMITS: Record<string, number> = {
+  free: 10,
+  pro: 100,
+  business: Infinity,
+};
 
 export default function StatsCards({
   posts,
   today,
   currentMonth,
+  userPlan,
 }: StatsCardsProps) {
   const monthPosts = posts.filter((p) =>
     p.scheduledAt.startsWith(currentMonth)
   );
   const todayPosts = posts.filter((p) => p.scheduledAt === today);
+  const limit = PLAN_LIMITS[userPlan];
+  const usedCount = monthPosts.length;
+  const pct = limit === Infinity ? 0 : Math.min(100, Math.round((usedCount / limit) * 100));
+  const isNearLimit = limit !== Infinity && usedCount >= limit * 0.8;
+  const isAtLimit = limit !== Infinity && usedCount >= limit;
 
   const platformCounts = (list: ScheduledPost[]) =>
     (["instagram", "twitter", "youtube"] as const).map((platform) => ({
@@ -26,15 +40,52 @@ export default function StatsCards({
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-      {/* This month */}
+      {/* This month + usage */}
       <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 shadow-sm">
         <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
           이번 달 예약
         </p>
         <p className="mt-1 text-4xl font-bold text-zinc-900 dark:text-zinc-100">
-          {monthPosts.length}
+          {usedCount}
+          {limit !== Infinity && (
+            <span className="ml-1 text-base font-normal text-zinc-400 dark:text-zinc-500">
+              / {limit}
+            </span>
+          )}
         </p>
-        <div className="mt-3 flex gap-2 flex-wrap">
+
+        {/* Usage bar */}
+        {limit !== Infinity && (
+          <div className="mt-2">
+            <div className="h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  isAtLimit ? "bg-red-500" : isNearLimit ? "bg-amber-400" : "bg-indigo-500"
+                }`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            {isAtLimit ? (
+              <p className="mt-1 text-[10px] text-red-500 font-medium">
+                한도 초과 —{" "}
+                <Link href="/pricing" className="underline">업그레이드</Link>
+              </p>
+            ) : isNearLimit ? (
+              <p className="mt-1 text-[10px] text-amber-500 font-medium">
+                {limit - usedCount}개 남음
+              </p>
+            ) : (
+              <p className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">
+                {limit - usedCount}개 남음
+              </p>
+            )}
+          </div>
+        )}
+        {limit === Infinity && (
+          <p className="mt-1 text-[10px] text-indigo-500 font-medium">무제한 ✓</p>
+        )}
+
+        <div className="mt-2 flex gap-2 flex-wrap">
           {platformCounts(monthPosts).map(({ platform, count }) => (
             <span
               key={platform}

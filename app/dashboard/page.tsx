@@ -347,7 +347,7 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <StatsCards posts={posts} today={today} currentMonth={currentMonth} />
+            <StatsCards posts={posts} today={today} currentMonth={currentMonth} userPlan={userPlan} />
 
             {/* Search results */}
             {showSearch && searchQuery.trim() && (() => {
