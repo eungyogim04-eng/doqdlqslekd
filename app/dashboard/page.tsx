@@ -161,6 +161,18 @@ export default function Home() {
     }
   }
 
+  async function handleMovePost(postId: string, newDate: string) {
+    const { error } = await supabase
+      .from("posts")
+      .update({ scheduled_at: newDate })
+      .eq("id", postId);
+
+    if (!error) {
+      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, scheduledAt: newDate } : p));
+      setSelectedDate(newDate);
+    }
+  }
+
   async function handleUpdatePost(updated: ScheduledPost) {
     const { error } = await supabase
       .from("posts")
@@ -260,6 +272,7 @@ export default function Home() {
                   posts={posts}
                   today={today}
                   onDayClick={(d) => setSelectedDate((prev) => (prev === d ? null : d))}
+                  onMovePost={handleMovePost}
                 />
               </div>
 
