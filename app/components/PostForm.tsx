@@ -21,6 +21,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const [repeat, setRepeat] = useState<"none" | "daily" | "weekly" | "monthly">("none");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAiGenerate() {
@@ -90,19 +91,36 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       setImageUploading(false);
     }
 
-    const post: ScheduledPost = {
-      id: crypto.randomUUID(),
-      content: content.trim(),
-      platform,
-      scheduledAt: date,
-      time,
-      createdAt: new Date().toISOString(),
-      imageUrl,
-    };
+    // 반복 예약: 최대 8주치 포스트 생성
+    const dates: string[] = [date];
+    if (repeat !== "none") {
+      const base = new Date(date);
+      const count = repeat === "daily" ? 13 : repeat === "weekly" ? 7 : 2;
+      for (let i = 1; i <= count; i++) {
+        const next = new Date(base);
+        if (repeat === "daily") next.setDate(base.getDate() + i);
+        else if (repeat === "weekly") next.setDate(base.getDate() + i * 7);
+        else next.setMonth(base.getMonth() + i);
+        dates.push(next.toISOString().split("T")[0]);
+      }
+    }
 
-    onAdd(post);
+    for (const d of dates) {
+      const post: ScheduledPost = {
+        id: crypto.randomUUID(),
+        content: content.trim(),
+        platform,
+        scheduledAt: d,
+        time,
+        createdAt: new Date().toISOString(),
+        imageUrl,
+      };
+      onAdd(post);
+    }
+
     setContent("");
     setError("");
+    setRepeat("none");
     removeImage();
   }
 
@@ -221,6 +239,32 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
           onChange={handleImageChange}
           className="hidden"
         />
+      </div>
+
+      {/* 반복 예약 */}
+      <div className="mt-3">
+        <label className="block text-xs text-zinc-500 mb-1">반복</label>
+        <div className="flex gap-2">
+          {(["none", "daily", "weekly", "monthly"] as const).map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setRepeat(r)}
+              className={`flex-1 rounded-lg py-1.5 text-xs font-semibold border transition-all ${
+                repeat === r
+                  ? "bg-indigo-600 text-white border-indigo-600"
+                  : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
+              }`}
+            >
+              {r === "none" ? "없음" : r === "daily" ? "매일" : r === "weekly" ? "매주" : "매월"}
+            </button>
+          ))}
+        </div>
+        {repeat !== "none" && (
+          <p className="mt-1 text-xs text-indigo-500">
+            {repeat === "daily" ? "14일간 매일" : repeat === "weekly" ? "8주간 매주" : "3개월간 매월"} 자동 등록됩니다
+          </p>
+        )}
       </div>
 
       {/* Date & time */}
