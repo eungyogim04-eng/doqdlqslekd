@@ -205,7 +205,7 @@ export default function Home() {
           <nav className="flex items-center gap-1 text-sm">
             <Link href="/dashboard" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50">캘린더</Link>
             <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">분석</Link>
-            <button className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">설정</button>
+            <Link href="/team" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">팀</Link>
           </nav>
 
           <div className="flex items-center gap-3">
