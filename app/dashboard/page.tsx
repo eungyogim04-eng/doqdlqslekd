@@ -154,6 +154,7 @@ export default function Home() {
         scheduledAt: data.scheduled_at,
         time: data.time,
         createdAt: data.created_at,
+        imageUrl: data.image_url ?? undefined,
       };
       setPosts((prev) => [...prev, saved]);
       setSelectedDate(saved.scheduledAt);
