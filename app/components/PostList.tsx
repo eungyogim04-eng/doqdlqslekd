@@ -9,6 +9,7 @@ interface PostListProps {
   onDelete: (id: string) => void;
   onEdit: (post: ScheduledPost) => void;
   onClose: () => void;
+  onDuplicate: (post: ScheduledPost) => void;
 }
 
 export default function PostList({
@@ -17,6 +18,7 @@ export default function PostList({
   onDelete,
   onEdit,
   onClose,
+  onDuplicate,
 }: PostListProps) {
   const [publishing, setPublishing] = useState<string | null>(null);
   const [published, setPublished] = useState<Set<string>>(new Set());
@@ -114,6 +116,12 @@ export default function PostList({
                     className="text-xs text-zinc-400 hover:text-indigo-500 transition-colors"
                   >
                     편집
+                  </button>
+                  <button
+                    onClick={() => onDuplicate(post)}
+                    className="text-xs text-zinc-400 hover:text-green-500 transition-colors"
+                  >
+                    복제
                   </button>
                   <button
                     onClick={() => onDelete(post.id)}

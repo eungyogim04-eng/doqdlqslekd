@@ -173,6 +173,34 @@ export default function Home() {
     }
   }
 
+  async function handleDuplicatePost(post: ScheduledPost) {
+    const { data, error } = await supabase
+      .from("posts")
+      .insert({
+        content: post.content,
+        platform: post.platform,
+        scheduled_at: post.scheduledAt,
+        time: post.time,
+        user_id: user!.id,
+        image_url: post.imageUrl ?? null,
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      const duplicated: ScheduledPost = {
+        id: data.id,
+        content: data.content,
+        platform: data.platform,
+        scheduledAt: data.scheduled_at,
+        time: data.time,
+        createdAt: data.created_at,
+        imageUrl: data.image_url ?? undefined,
+      };
+      setPosts((prev) => [...prev, duplicated]);
+    }
+  }
+
   async function handleUpdatePost(updated: ScheduledPost) {
     const { error } = await supabase
       .from("posts")
@@ -285,6 +313,7 @@ export default function Home() {
                     onDelete={handleDeletePost}
                     onEdit={(post) => setEditingPost(post)}
                     onClose={() => setSelectedDate(null)}
+                    onDuplicate={handleDuplicatePost}
                   />
                 )}
                 <PostForm
