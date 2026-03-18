@@ -10,6 +10,7 @@ import PostList from "../components/PostList";
 import EditPostModal from "../components/EditPostModal";
 import WeekView from "../components/WeekView";
 import DayView from "../components/DayView";
+import OnboardingModal from "../components/OnboardingModal";
 import { ScheduledPost } from "../types";
 import { supabase } from "../../lib/supabase";
 import { useDarkMode } from "../components/ThemeProvider";
@@ -34,6 +35,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [calView, setCalView] = useState<"month" | "week" | "day">("month");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { dark, toggle: toggleDark } = useDarkMode();
 
   const PLAN_LIMITS = {
@@ -72,6 +74,15 @@ export default function Home() {
     supabase.from("user_plans").select("plan").eq("user_id", user.id).single().then(({ data }) => {
       if (data?.plan) setUserPlan(data.plan as "free" | "pro" | "business");
     });
+  }, [user]);
+
+  // Onboarding: show once per user
+  useEffect(() => {
+    if (!user) return;
+    const key = `postly_onboarded_${user.id}`;
+    if (!localStorage.getItem(key)) {
+      setShowOnboarding(true);
+    }
   }, [user]);
 
   // Load posts from Supabase
@@ -511,6 +522,14 @@ export default function Home() {
         onClose={() => setEditingPost(null)}
         onSave={handleUpdatePost}
       />
+      {showOnboarding && (
+        <OnboardingModal
+          onComplete={() => {
+            setShowOnboarding(false);
+            if (user) localStorage.setItem(`postly_onboarded_${user.id}`, "1");
+          }}
+        />
+      )}
     </div>
   );
 }
