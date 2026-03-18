@@ -11,6 +11,7 @@ export interface ScheduledPost {
   createdAt: string;
   imageUrl?: string;
   status?: PostStatus;
+  tags?: string[];
 }
 
 export const PLATFORM_CONFIG: Record<

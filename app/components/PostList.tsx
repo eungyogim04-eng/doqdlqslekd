@@ -97,6 +97,15 @@ export default function PostList({
                     )}
                   </div>
                   <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words">{post.content}</p>
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {post.tags.map((tag) => (
+                        <span key={tag} className="rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-500 dark:text-zinc-400">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   {post.imageUrl && (
                     <img src={post.imageUrl} alt="" className="mt-2 rounded-lg w-full h-28 object-cover border border-zinc-100 dark:border-zinc-700" />
                   )}

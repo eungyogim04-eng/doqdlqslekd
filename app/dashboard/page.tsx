@@ -94,6 +94,7 @@ export default function Home() {
           time: row.time,
           createdAt: row.created_at,
           imageUrl: row.image_url ?? undefined,
+          tags: row.tags ?? [],
         }));
         setPosts(mapped);
       }
@@ -149,6 +150,7 @@ export default function Home() {
         time: post.time,
         user_id: user!.id,
         image_url: post.imageUrl ?? null,
+        tags: post.tags ?? [],
       })
       .select()
       .single();
@@ -162,6 +164,7 @@ export default function Home() {
         time: data.time,
         createdAt: data.created_at,
         imageUrl: data.image_url ?? undefined,
+        tags: data.tags ?? [],
       };
       setPosts((prev) => [...prev, saved]);
       setSelectedDate(saved.scheduledAt);

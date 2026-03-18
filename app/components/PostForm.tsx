@@ -26,6 +26,8 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   const [hashtagLoading, setHashtagLoading] = useState(false);
   const [bestTimes, setBestTimes] = useState<{ time: string; reason: string }[]>([]);
   const [bestTimeLoading, setBestTimeLoading] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAiGenerate() {
@@ -159,6 +161,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
         time,
         createdAt: new Date().toISOString(),
         imageUrl,
+        tags: tags.length > 0 ? [...tags] : undefined,
       };
       onAdd(post);
     }
@@ -166,6 +169,8 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
     setContent("");
     setError("");
     setRepeat("none");
+    setTags([]);
+    setTagInput("");
     removeImage();
   }
 
@@ -341,6 +346,49 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
           <p className="mt-1 text-xs text-indigo-500 dark:text-indigo-400">
             {repeat === "daily" ? "14일간 매일" : repeat === "weekly" ? "8주간 매주" : "3개월간 매월"} 자동 등록됩니다
           </p>
+        )}
+      </div>
+
+      {/* 태그 */}
+      <div className="mt-3">
+        <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">태그</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.key === "Enter" || e.key === ",") && tagInput.trim()) {
+                e.preventDefault();
+                const t = tagInput.trim().replace(/^#/, "");
+                if (t && !tags.includes(t)) setTags((prev) => [...prev, t]);
+                setTagInput("");
+              } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
+                setTags((prev) => prev.slice(0, -1));
+              }
+            }}
+            placeholder="Enter 또는 쉼표로 태그 추가"
+            className="flex-1 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+          />
+        </div>
+        {tags.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 text-xs text-zinc-600 dark:text-zinc-300"
+              >
+                #{tag}
+                <button
+                  type="button"
+                  onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                  className="text-zinc-400 hover:text-red-500 transition-colors leading-none"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
         )}
       </div>
 
