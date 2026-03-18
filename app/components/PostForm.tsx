@@ -24,6 +24,8 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   const [repeat, setRepeat] = useState<"none" | "daily" | "weekly" | "monthly">("none");
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [hashtagLoading, setHashtagLoading] = useState(false);
+  const [bestTimes, setBestTimes] = useState<{ time: string; reason: string }[]>([]);
+  const [bestTimeLoading, setBestTimeLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAiGenerate() {
@@ -77,6 +79,24 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       setError("해시태그 추천 실패. 다시 시도해주세요.");
     } finally {
       setHashtagLoading(false);
+    }
+  }
+
+  async function handleBestTime() {
+    setBestTimeLoading(true);
+    setBestTimes([]);
+    try {
+      const res = await fetch("/api/best-time", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform }),
+      });
+      const data = await res.json();
+      if (data.times) setBestTimes(data.times);
+    } catch {
+      // silent fail
+    } finally {
+      setBestTimeLoading(false);
     }
   }
 
@@ -344,6 +364,45 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
             className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
           />
         </div>
+      </div>
+
+      {/* AI 최적 게시 시간 */}
+      <div className="mt-2">
+        <button
+          type="button"
+          onClick={handleBestTime}
+          disabled={bestTimeLoading}
+          className="text-xs text-indigo-500 hover:text-indigo-700 font-medium flex items-center gap-1 disabled:opacity-50"
+        >
+          {bestTimeLoading ? (
+            <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          ) : (
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          )}
+          {bestTimeLoading ? "AI 분석 중..." : "AI 최적 게시 시간"}
+        </button>
+        {bestTimes.length > 0 && (
+          <div className="mt-2 flex flex-col gap-1.5">
+            {bestTimes.map((t) => (
+              <button
+                key={t.time}
+                type="button"
+                onClick={() => { setTime(t.time); setBestTimes([]); }}
+                className="flex items-center justify-between rounded-lg border border-indigo-100 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/50 px-3 py-1.5 text-left hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors group"
+              >
+                <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400">{t.time}</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 flex-1 mx-2 truncate">{t.reason}</span>
+                <span className="text-[10px] text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">적용 →</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <button
