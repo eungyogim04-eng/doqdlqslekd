@@ -1,5 +1,7 @@
 export type Platform = "instagram" | "twitter" | "youtube";
 
+export type PostStatus = "draft" | "pending" | "approved" | "rejected";
+
 export interface ScheduledPost {
   id: string;
   content: string;
@@ -8,6 +10,7 @@ export interface ScheduledPost {
   time: string; // HH:MM
   createdAt: string;
   imageUrl?: string;
+  status?: PostStatus;
 }
 
 export const PLATFORM_CONFIG: Record<
