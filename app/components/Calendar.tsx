@@ -60,13 +60,13 @@ export default function Calendar({
   }, {});
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
-      <div className="grid grid-cols-7 border-b border-zinc-100">
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
+      <div className="grid grid-cols-7 border-b border-zinc-100 dark:border-zinc-800">
         {WEEKDAYS.map((d, i) => (
           <div
             key={d}
             className={`py-3 text-center text-xs font-semibold uppercase tracking-wide ${
-              i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-zinc-500"
+              i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-zinc-500 dark:text-zinc-400"
             }`}
           >
             {d}
@@ -95,18 +95,18 @@ export default function Calendar({
                 setDraggingPostId(null);
                 setDragOverDate(null);
               }}
-              className={`min-h-[88px] p-2 text-left border-b border-r border-zinc-100 transition-colors cursor-pointer
-                ${!cell.thisMonth ? "bg-zinc-50/60" : "hover:bg-zinc-50"}
+              className={`min-h-[88px] p-2 text-left border-b border-r border-zinc-100 dark:border-zinc-800 transition-colors cursor-pointer
+                ${!cell.thisMonth ? "bg-zinc-50/60 dark:bg-zinc-950/60" : "hover:bg-zinc-50 dark:hover:bg-zinc-800"}
                 ${idx % 7 === 6 ? "border-r-0" : ""}
-                ${isDragOver ? "bg-indigo-50 border-indigo-300 border-2" : ""}
+                ${isDragOver ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 border-2" : ""}
               `}
             >
               <span
                 className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium
                   ${isToday ? "bg-indigo-600 text-white" : ""}
                   ${!isToday && isWeekend && cell.thisMonth ? (idx % 7 === 0 ? "text-red-400" : "text-blue-400") : ""}
-                  ${!isToday && !isWeekend && cell.thisMonth ? "text-zinc-800" : ""}
-                  ${!cell.thisMonth && !isToday ? "text-zinc-300" : ""}
+                  ${!isToday && !isWeekend && cell.thisMonth ? "text-zinc-800 dark:text-zinc-200" : ""}
+                  ${!cell.thisMonth && !isToday ? "text-zinc-300 dark:text-zinc-600" : ""}
                 `}
               >
                 {cell.day}
@@ -139,7 +139,7 @@ export default function Calendar({
                     );
                   })}
                   {dayPosts.length > 3 && (
-                    <span className="text-[10px] text-zinc-400 pl-1">+{dayPosts.length - 3}개 더</span>
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 pl-1">+{dayPosts.length - 3}개 더</span>
                   )}
                 </div>
               )}

@@ -10,6 +10,7 @@ import PostList from "../components/PostList";
 import EditPostModal from "../components/EditPostModal";
 import { ScheduledPost } from "../types";
 import { supabase } from "../../lib/supabase";
+import { useDarkMode } from "../components/ThemeProvider";
 import type { User } from "@supabase/supabase-js";
 
 const MONTH_NAMES = [
@@ -30,6 +31,7 @@ export default function Home() {
   const [userPlan, setUserPlan] = useState<"free" | "pro" | "business">("free");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const { dark, toggle: toggleDark } = useDarkMode();
 
   const PLAN_LIMITS = {
     free: { posts: 10, platforms: ["instagram", "twitter"] },
@@ -228,9 +230,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
@@ -241,21 +243,41 @@ export default function Home() {
                 <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
             </div>
-            <span className="text-base font-bold text-zinc-900">Postly</span>
+            <span className="text-base font-bold text-zinc-900 dark:text-zinc-100">Postly</span>
           </div>
 
           <nav className="flex items-center gap-1 text-sm">
-            <Link href="/dashboard" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50">캘린더</Link>
-            <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">분석</Link>
-            <Link href="/team" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">팀</Link>
-            <Link href="/approvals" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors">승인</Link>
+            <Link href="/dashboard" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50 dark:bg-indigo-950">캘린더</Link>
+            <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">분석</Link>
+            <Link href="/team" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">팀</Link>
+            <Link href="/approvals" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">승인</Link>
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Dark mode toggle */}
+            <button
+              onClick={toggleDark}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+              title={dark ? "라이트 모드" : "다크 모드"}
+            >
+              {dark ? (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
             {/* Search toggle button */}
             <button
               onClick={() => { setShowSearch((v) => !v); setSearchQuery(""); }}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${showSearch ? "border-indigo-300 bg-indigo-50 text-indigo-600" : "border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50"}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${showSearch ? "border-indigo-300 bg-indigo-50 dark:bg-indigo-950 text-indigo-600" : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"}`}
               title="검색"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -264,13 +286,13 @@ export default function Home() {
               </svg>
             </button>
             {user && (
-              <span className="hidden sm:block text-xs text-zinc-500 truncate max-w-[140px]">
+              <span className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-[140px]">
                 {user.email}
               </span>
             )}
             <button
               onClick={handleLogout}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-1.5 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-1.5 text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
               로그아웃
             </button>
@@ -280,7 +302,7 @@ export default function Home() {
               </Link>
             )}
             {userPlan !== "free" && (
-              <span className="rounded-xl bg-indigo-100 px-4 py-1.5 text-sm font-semibold text-indigo-700 capitalize">
+              <span className="rounded-xl bg-indigo-100 dark:bg-indigo-950 px-4 py-1.5 text-sm font-semibold text-indigo-700 dark:text-indigo-300 capitalize">
                 {userPlan} 플랜 ✓
               </span>
             )}
@@ -290,7 +312,7 @@ export default function Home() {
 
       {/* Search bar */}
       {showSearch && (
-        <div className="border-b border-zinc-200 bg-white px-4 py-3 sm:px-6">
+        <div className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 sm:px-6">
           <div className="mx-auto max-w-6xl">
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -303,7 +325,7 @@ export default function Home() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="포스트 내용, 플랫폼으로 검색..."
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-4 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 py-2 pl-9 pr-4 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
               />
               {searchQuery && (
                 <button
@@ -336,15 +358,15 @@ export default function Home() {
                   p.platform.toLowerCase().includes(q)
               );
               return (
-                <div className="mt-6 rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
-                    <h3 className="text-sm font-semibold text-zinc-800">
+                <div className="mt-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                    <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                       검색 결과 <span className="text-indigo-600">&ldquo;{searchQuery}&rdquo;</span>
                       <span className="ml-2 text-xs font-normal text-zinc-400">{results.length}개</span>
                     </h3>
                   </div>
                   {results.length === 0 ? (
-                    <p className="px-5 py-8 text-center text-sm text-zinc-400">검색 결과가 없습니다.</p>
+                    <p className="px-5 py-8 text-center text-sm text-zinc-400 dark:text-zinc-500">검색 결과가 없습니다.</p>
                   ) : (
                     <ul className="divide-y divide-zinc-100">
                       {results.map((post) => {
@@ -365,7 +387,7 @@ export default function Home() {
                         return (
                           <li
                             key={post.id}
-                            className="flex items-start gap-3 px-5 py-4 hover:bg-zinc-50 cursor-pointer transition-colors"
+                            className="flex items-start gap-3 px-5 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
                             onClick={() => {
                               setSelectedDate(post.scheduledAt);
                               // navigate calendar to the post's month
@@ -402,11 +424,11 @@ export default function Home() {
 
             <div className="mt-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <button onClick={prevMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition-colors">‹</button>
-                <h2 className="text-lg font-bold text-zinc-900">{year}년 {MONTH_NAMES[month]}</h2>
-                <button onClick={nextMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 transition-colors">›</button>
+                <button onClick={prevMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">‹</button>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{year}년 {MONTH_NAMES[month]}</h2>
+                <button onClick={nextMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">›</button>
               </div>
-              <button onClick={goToday} className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors">오늘</button>
+              <button onClick={goToday} className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">오늘</button>
             </div>
 
             <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">

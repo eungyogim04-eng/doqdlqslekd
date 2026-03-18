@@ -27,11 +27,11 @@ export default function StatsCards({
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
       {/* This month */}
-      <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
+      <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
           이번 달 예약
         </p>
-        <p className="mt-1 text-4xl font-bold text-zinc-900">
+        <p className="mt-1 text-4xl font-bold text-zinc-900 dark:text-zinc-100">
           {monthPosts.length}
         </p>
         <div className="mt-3 flex gap-2 flex-wrap">
@@ -50,11 +50,11 @@ export default function StatsCards({
       </div>
 
       {/* Today */}
-      <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
+      <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 shadow-sm">
+        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
           오늘 예정
         </p>
-        <p className="mt-1 text-4xl font-bold text-zinc-900">
+        <p className="mt-1 text-4xl font-bold text-zinc-900 dark:text-zinc-100">
           {todayPosts.length}
         </p>
         <div className="mt-3 flex gap-2 flex-wrap">
@@ -72,7 +72,7 @@ export default function StatsCards({
             ) : null
           )}
           {todayPosts.length === 0 && (
-            <span className="text-xs text-zinc-400">없음</span>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">없음</span>
           )}
         </div>
       </div>
@@ -89,8 +89,8 @@ export default function StatsCards({
             <p className={`text-xs font-medium uppercase tracking-wide ${cfg.color}`}>
               {cfg.label}
             </p>
-            <p className="mt-1 text-4xl font-bold text-zinc-900">{count}</p>
-            <p className="mt-3 text-xs text-zinc-500">전체 예약</p>
+            <p className="mt-1 text-4xl font-bold text-zinc-900 dark:text-zinc-100">{count}</p>
+            <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">전체 예약</p>
           </div>
         );
       })}

@@ -59,25 +59,25 @@ export default function PostList({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
-        <h3 className="text-sm font-semibold text-zinc-800">
+    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+        <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
           {dateLabel} 예약 포스트
         </h3>
         <button
           onClick={onClose}
-          className="text-zinc-400 hover:text-zinc-600 text-lg leading-none"
+          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-lg leading-none"
         >
           ✕
         </button>
       </div>
 
       {dayPosts.length === 0 ? (
-        <p className="px-5 py-8 text-center text-sm text-zinc-400">
+        <p className="px-5 py-8 text-center text-sm text-zinc-400 dark:text-zinc-500">
           이 날 예약된 포스트가 없습니다.
         </p>
       ) : (
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {dayPosts.map((post) => {
             const cfg = PLATFORM_CONFIG[post.platform];
             const isPublished = published.has(post.id);
@@ -89,16 +89,16 @@ export default function PostList({
                     <span className={`text-xs font-semibold ${cfg.color}`}>
                       {cfg.label}
                     </span>
-                    <span className="text-xs text-zinc-400">{post.time}</span>
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500">{post.time}</span>
                     {isPublished && (
                       <span className="text-xs bg-green-100 text-green-600 rounded-full px-2 py-0.5 font-medium">
                         발행완료
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-zinc-700 break-words">{post.content}</p>
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words">{post.content}</p>
                   {post.imageUrl && (
-                    <img src={post.imageUrl} alt="" className="mt-2 rounded-lg w-full h-28 object-cover border border-zinc-100" />
+                    <img src={post.imageUrl} alt="" className="mt-2 rounded-lg w-full h-28 object-cover border border-zinc-100 dark:border-zinc-700" />
                   )}
                 </div>
                 <div className="flex flex-col gap-1 shrink-0">

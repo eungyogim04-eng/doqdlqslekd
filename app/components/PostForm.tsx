@@ -152,9 +152,9 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-5"
+      className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm p-5"
     >
-      <h2 className="text-sm font-semibold text-zinc-800 mb-4">새 포스트 예약</h2>
+      <h2 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 mb-4">새 포스트 예약</h2>
 
       {/* Platform selector */}
       <div className="flex gap-2 mb-4">
@@ -170,7 +170,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
                 ${
                   selected
                     ? `${cfg.bg} ${cfg.color} ${cfg.border} shadow-sm`
-                    : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
+                    : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-600 hover:border-zinc-300 dark:hover:border-zinc-500"
                 }`}
             >
               <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
@@ -181,8 +181,8 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       </div>
 
       {/* AI 글쓰기 */}
-      <div className="mb-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3">
-        <p className="text-xs font-semibold text-indigo-700 mb-2 flex items-center gap-1">
+      <div className="mb-3 rounded-xl border border-indigo-100 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/50 p-3">
+        <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-1">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
           </svg>
@@ -195,7 +195,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAiGenerate())}
             placeholder="주제 입력 (예: 봄 신상품 출시)"
-            className="flex-1 rounded-lg border border-indigo-200 bg-white px-3 py-2 text-xs text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-zinc-800 px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
           <button
             type="button"
@@ -225,7 +225,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
         }}
         placeholder="포스트 내용을 입력하거나 AI로 생성하세요…"
         rows={4}
-        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition"
+        className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition"
       />
 
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
@@ -253,7 +253,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
                 key={tag}
                 type="button"
                 onClick={() => addHashtag(tag)}
-                className="rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-1 text-xs text-indigo-600 hover:bg-indigo-100 transition-colors"
+                className="rounded-full bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-2.5 py-1 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors"
               >
                 {tag} +
               </button>
@@ -265,7 +265,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       {/* Image upload */}
       <div className="mt-3">
         {imagePreview ? (
-          <div className="relative rounded-xl overflow-hidden border border-zinc-200">
+          <div className="relative rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700">
             <img src={imagePreview} alt="preview" className="w-full h-36 object-cover" />
             <button
               type="button"
@@ -281,7 +281,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full rounded-xl border border-dashed border-zinc-300 bg-zinc-50 py-3 text-xs text-zinc-400 hover:border-indigo-300 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2"
+            className="w-full rounded-xl border border-dashed border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 py-3 text-xs text-zinc-400 hover:border-indigo-300 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 21h18M5.25 6.75h.008v.008H5.25V6.75zm0 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
@@ -300,7 +300,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
 
       {/* 반복 예약 */}
       <div className="mt-3">
-        <label className="block text-xs text-zinc-500 mb-1">반복</label>
+        <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">반복</label>
         <div className="flex gap-2">
           {(["none", "daily", "weekly", "monthly"] as const).map((r) => (
             <button
@@ -310,7 +310,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
               className={`flex-1 rounded-lg py-1.5 text-xs font-semibold border transition-all ${
                 repeat === r
                   ? "bg-indigo-600 text-white border-indigo-600"
-                  : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
+                  : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-600 hover:border-zinc-300 dark:hover:border-zinc-500"
               }`}
             >
               {r === "none" ? "없음" : r === "daily" ? "매일" : r === "weekly" ? "매주" : "매월"}
@@ -318,7 +318,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
           ))}
         </div>
         {repeat !== "none" && (
-          <p className="mt-1 text-xs text-indigo-500">
+          <p className="mt-1 text-xs text-indigo-500 dark:text-indigo-400">
             {repeat === "daily" ? "14일간 매일" : repeat === "weekly" ? "8주간 매주" : "3개월간 매월"} 자동 등록됩니다
           </p>
         )}
@@ -327,21 +327,21 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
       {/* Date & time */}
       <div className="mt-3 flex gap-3">
         <div className="flex-1">
-          <label className="block text-xs text-zinc-500 mb-1">날짜</label>
+          <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">날짜</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
           />
         </div>
         <div className="w-32">
-          <label className="block text-xs text-zinc-500 mb-1">시간</label>
+          <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">시간</label>
           <input
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
           />
         </div>
       </div>

@@ -43,10 +43,10 @@ export default function EditPostModal({ post, onClose, onSave }: EditPostModalPr
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-6">
+      <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-zinc-900 shadow-2xl p-6 border border-zinc-200 dark:border-zinc-700">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold text-zinc-900">포스트 편집</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+          <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">포스트 편집</h2>
+          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -66,7 +66,7 @@ export default function EditPostModal({ post, onClose, onSave }: EditPostModalPr
                 className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border transition-all
                   ${selected
                     ? `${cfg.bg} ${cfg.color} ${cfg.border} shadow-sm`
-                    : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-300"
+                    : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-600 hover:border-zinc-300 dark:hover:border-zinc-500"
                   }`}
               >
                 <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
@@ -81,28 +81,28 @@ export default function EditPostModal({ post, onClose, onSave }: EditPostModalPr
           value={content}
           onChange={(e) => { setContent(e.target.value); setError(""); }}
           rows={5}
-          className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition"
+          className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition"
         />
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
 
         {/* Date & time */}
         <div className="mt-3 flex gap-3">
           <div className="flex-1">
-            <label className="block text-xs text-zinc-500 mb-1">날짜</label>
+            <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">날짜</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
             />
           </div>
           <div className="w-32">
-            <label className="block text-xs text-zinc-500 mb-1">시간</label>
+            <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">시간</label>
             <input
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
             />
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function EditPostModal({ post, onClose, onSave }: EditPostModalPr
         <div className="mt-5 flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 rounded-xl border border-zinc-200 py-2.5 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+            className="flex-1 rounded-xl border border-zinc-200 dark:border-zinc-700 py-2.5 text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
           >
             취소
           </button>
