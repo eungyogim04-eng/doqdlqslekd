@@ -252,29 +252,52 @@ export default function Home() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 h-13 sm:px-6" style={{height: "52px"}}>
-          {/* Logo */}
-          <span className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Postly</span>
+  // Diary: today's greeting
+  const todayDate = new Date();
+  const weekdays = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+  const todayLabel = `${todayDate.getMonth() + 1}월 ${todayDate.getDate()}일 ${weekdays[todayDate.getDay()]}`;
+  const hour = todayDate.getHours();
+  const greeting =
+    hour < 6  ? "🌙 늦은 밤에도 열심히네요" :
+    hour < 12 ? "☀️ 좋은 아침이에요" :
+    hour < 18 ? "✏️ 오늘도 하나씩 기록해봐요" :
+                "🌇 오늘 하루도 수고했어요";
 
-          {/* Nav */}
+  const todayPostCount = posts.filter(p => p.scheduledAt === today).length;
+  const monthPostCount = posts.filter(p => p.scheduledAt.startsWith(currentMonth)).length;
+
+  return (
+    <div className="min-h-screen" style={{background: "var(--bg)"}}>
+
+      {/* Header */}
+      <header className="sticky top-0 z-10 backdrop-blur-md" style={{borderBottom: "1px solid var(--border)", background: "color-mix(in srgb, var(--bg-card) 90%, transparent)"}}>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6" style={{height: "52px"}}>
+          <span className="text-base font-bold tracking-tight" style={{color: "var(--text-1)"}}>Postly ✦</span>
+
           <nav className="hidden sm:flex items-center gap-6 text-sm">
-            <Link href="/dashboard" className="font-medium text-zinc-900 dark:text-zinc-100">캘린더</Link>
-            <Link href="/analytics" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">분석</Link>
-            <Link href="/team" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">팀</Link>
-            <Link href="/approvals" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">승인</Link>
-            <Link href="/settings" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">설정</Link>
+            {[
+              {href:"/dashboard", label:"캘린더", active:true},
+              {href:"/analytics", label:"분석", active:false},
+              {href:"/team", label:"팀", active:false},
+              {href:"/approvals", label:"승인", active:false},
+              {href:"/settings", label:"설정", active:false},
+            ].map(n => (
+              <Link
+                key={n.href}
+                href={n.href}
+                style={{color: n.active ? "var(--text-1)" : "var(--text-2)"}}
+                className="hover:opacity-80 transition-opacity font-medium"
+              >
+                {n.label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Right actions */}
           <div className="flex items-center gap-2">
-            {/* Dark mode */}
             <button
               onClick={toggleDark}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              style={{color: "var(--text-3)"}}
               title={dark ? "라이트 모드" : "다크 모드"}
             >
               {dark ? (
@@ -291,33 +314,33 @@ export default function Home() {
                 </svg>
               )}
             </button>
-            {/* Search */}
+
             <button
-              onClick={() => { setShowSearch((v) => !v); setSearchQuery(""); }}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${showSearch ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
-              title="검색"
+              onClick={() => { setShowSearch(v => !v); setSearchQuery(""); }}
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              style={{color: showSearch ? "var(--accent)" : "var(--text-3)"}}
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
 
-            <div className="w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1" />
+            <div className="w-px h-4 mx-1" style={{background: "var(--border)"}} />
 
             {userPlan === "free" ? (
-              <Link href="/pricing" className="rounded-lg bg-zinc-900 dark:bg-white px-3.5 py-1.5 text-xs font-semibold text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-colors">
+              <Link href="/pricing" className="rounded-full px-4 py-1.5 text-xs font-semibold text-white transition-colors" style={{background: "var(--accent)"}}>
                 업그레이드
               </Link>
             ) : (
-              <span className="rounded-lg bg-indigo-50 dark:bg-indigo-950 px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 capitalize">
-                {userPlan}
+              <span className="rounded-full px-3 py-1 text-xs font-semibold capitalize" style={{background: "var(--accent-bg)", color: "var(--accent-text)"}}>
+                {userPlan} ✓
               </span>
             )}
 
             <button
               onClick={handleLogout}
-              className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{color: "var(--text-2)"}}
             >
               로그아웃
             </button>
@@ -327,12 +350,11 @@ export default function Home() {
 
       {/* Search bar */}
       {showSearch && (
-        <div className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 sm:px-6">
+        <div className="px-4 py-3 sm:px-6" style={{borderBottom: "1px solid var(--border)", background: "var(--bg-card)"}}>
           <div className="mx-auto max-w-6xl">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{color:"var(--text-3)"}}>
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
               <input
                 autoFocus
@@ -340,15 +362,10 @@ export default function Home() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="포스트 내용, 플랫폼으로 검색..."
-                className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 py-2 pl-9 pr-4 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                className="diary-input w-full py-2.5 pl-10 pr-4 text-sm"
               />
               {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
-                >
-                  ✕
-                </button>
+                <button onClick={() => setSearchQuery("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm" style={{color:"var(--text-3)"}}>✕</button>
               )}
             </div>
           </div>
@@ -357,77 +374,84 @@ export default function Home() {
 
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         {loading ? (
-          <div className="flex items-center justify-center py-32">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+          <div className="flex flex-col items-center justify-center py-32 gap-3">
+            <div className="text-3xl animate-pulse">📖</div>
+            <p className="text-sm" style={{color:"var(--text-3)"}}>다이어리를 불러오는 중...</p>
           </div>
         ) : (
           <>
+            {/* Diary header — today's date */}
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium mb-1" style={{color: "var(--text-3)"}}>
+                  {greeting}
+                </p>
+                <h1 className="text-2xl font-bold" style={{color: "var(--text-1)"}}>
+                  {todayLabel}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                {todayPostCount > 0 && (
+                  <span className="rounded-full px-3 py-1 text-xs font-medium" style={{background:"var(--accent-bg)", color:"var(--accent-text)"}}>
+                    오늘 {todayPostCount}개 예정
+                  </span>
+                )}
+                <span className="rounded-full px-3 py-1 text-xs font-medium" style={{background:"var(--bg-hover)", color:"var(--text-2)"}}>
+                  이번 달 {monthPostCount}개 ✍️
+                </span>
+              </div>
+            </div>
+
             <StatsCards posts={posts} today={today} currentMonth={currentMonth} userPlan={userPlan} />
 
             {/* Search results */}
             {showSearch && searchQuery.trim() && (() => {
               const q = searchQuery.trim().toLowerCase();
               const results = posts.filter(
-                (p) =>
-                  p.content.toLowerCase().includes(q) ||
-                  p.platform.toLowerCase().includes(q)
+                p => p.content.toLowerCase().includes(q) || p.platform.toLowerCase().includes(q)
               );
               return (
-                <div className="mt-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
-                    <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                      검색 결과 <span className="text-indigo-600">&ldquo;{searchQuery}&rdquo;</span>
-                      <span className="ml-2 text-xs font-normal text-zinc-400">{results.length}개</span>
+                <div className="mt-5 diary-card overflow-hidden">
+                  <div className="flex items-center px-5 py-4" style={{borderBottom:"1px solid var(--border-light)"}}>
+                    <h3 className="text-sm font-semibold" style={{color:"var(--text-1)"}}>
+                      &ldquo;{searchQuery}&rdquo;{" "}
+                      <span className="font-normal" style={{color:"var(--text-3)"}}>{results.length}건</span>
                     </h3>
                   </div>
                   {results.length === 0 ? (
-                    <p className="px-5 py-8 text-center text-sm text-zinc-400 dark:text-zinc-500">검색 결과가 없습니다.</p>
+                    <p className="px-5 py-8 text-center text-sm" style={{color:"var(--text-3)"}}>검색 결과가 없어요 🔍</p>
                   ) : (
-                    <ul className="divide-y divide-zinc-100">
+                    <ul>
                       {results.map((post) => {
-                        const platformColors: Record<string, string> = {
-                          instagram: "text-pink-500",
-                          twitter: "text-sky-500",
-                          youtube: "text-red-500",
-                        };
-                        const platformLabels: Record<string, string> = {
-                          instagram: "Instagram",
-                          twitter: "Twitter/X",
-                          youtube: "YouTube",
-                        };
+                        const platformColors: Record<string, string> = {instagram:"var(--ig-text)", twitter:"var(--tw-text)", youtube:"var(--yt-text)"};
+                        const platformLabels: Record<string, string> = {instagram:"📸 Instagram", twitter:"🐦 Twitter/X", youtube:"🎬 YouTube"};
                         const highlighted = post.content.replace(
                           new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"),
-                          "<mark class=\"bg-yellow-100 text-yellow-800 rounded px-0.5\">$1</mark>"
+                          "<mark style=\"background:#FEF9C3;border-radius:2px;padding:0 2px;\">$1</mark>"
                         );
                         return (
                           <li
                             key={post.id}
-                            className="flex items-start gap-3 px-5 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+                            className="flex items-start gap-3 px-5 py-4 cursor-pointer transition-colors"
+                            style={{borderBottom:"1px solid var(--border-light)"}}
+                            onMouseEnter={e => (e.currentTarget.style.background = "var(--bg-hover)")}
+                            onMouseLeave={e => (e.currentTarget.style.background = "")}
                             onClick={() => {
                               setSelectedDate(post.scheduledAt);
-                              // navigate calendar to the post's month
                               const [y, m] = post.scheduledAt.split("-").map(Number);
-                              setYear(y);
-                              setMonth(m - 1);
-                              setShowSearch(false);
-                              setSearchQuery("");
+                              setYear(y); setMonth(m - 1);
+                              setShowSearch(false); setSearchQuery("");
                             }}
                           >
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                <span className={`text-xs font-semibold ${platformColors[post.platform] ?? "text-zinc-500"}`}>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold" style={{color: platformColors[post.platform]}}>
                                   {platformLabels[post.platform] ?? post.platform}
                                 </span>
-                                <span className="text-xs text-zinc-400">{post.scheduledAt} {post.time}</span>
+                                <span className="text-xs" style={{color:"var(--text-3)"}}>{post.scheduledAt} {post.time}</span>
                               </div>
-                              <p
-                                className="text-sm text-zinc-700 break-words"
-                                dangerouslySetInnerHTML={{ __html: highlighted }}
-                              />
+                              <p className="text-sm break-words" style={{color:"var(--text-1)"}} dangerouslySetInnerHTML={{ __html: highlighted }} />
                             </div>
-                            <svg className="h-4 w-4 shrink-0 mt-1 text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                              <path d="M9 18l6-6-6-6" />
-                            </svg>
                           </li>
                         );
                       })}
@@ -437,23 +461,25 @@ export default function Home() {
               );
             })()}
 
-            <div className="mt-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button onClick={prevMonth} className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-lg leading-none">‹</button>
-                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">{year}년 {MONTH_NAMES[month]}</h2>
-                <button onClick={nextMonth} className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-lg leading-none">›</button>
-                <button onClick={goToday} className="ml-1 rounded-md px-2.5 py-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">오늘</button>
+            {/* Calendar toolbar */}
+            <div className="mt-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button onClick={prevMonth} className="flex h-7 w-7 items-center justify-center rounded-full text-lg transition-colors" style={{color:"var(--text-3)"}} onMouseEnter={e=>{(e.target as HTMLElement).style.background="var(--bg-hover)"}} onMouseLeave={e=>{(e.target as HTMLElement).style.background=""}}>‹</button>
+                <h2 className="text-sm font-semibold tabular-nums" style={{color:"var(--text-1)"}}>{year}년 {MONTH_NAMES[month]}</h2>
+                <button onClick={nextMonth} className="flex h-7 w-7 items-center justify-center rounded-full text-lg transition-colors" style={{color:"var(--text-3)"}} onMouseEnter={e=>{(e.target as HTMLElement).style.background="var(--bg-hover)"}} onMouseLeave={e=>{(e.target as HTMLElement).style.background=""}}>›</button>
+                <button onClick={goToday} className="ml-1 rounded-full px-3 py-1 text-xs font-medium transition-colors" style={{border:"1px solid var(--border)", color:"var(--text-2)"}}>
+                  오늘
+                </button>
               </div>
-              <div className="flex items-center gap-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-0.5">
+              <div className="flex items-center gap-0.5 rounded-full p-1" style={{background:"var(--bg-hover)"}}>
                 {(["month", "week", "day"] as const).map((v) => (
                   <button
                     key={v}
                     onClick={() => setCalView(v)}
-                    className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                      calView === v
-                        ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                        : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
-                    }`}
+                    className="px-3 py-1 text-xs font-medium rounded-full transition-all"
+                    style={calView === v
+                      ? {background:"var(--bg-card)", color:"var(--text-1)", boxShadow:"0 1px 3px rgba(0,0,0,0.08)"}
+                      : {color:"var(--text-2)"}}
                   >
                     {v === "month" ? "월" : v === "week" ? "주" : "일"}
                   </button>
@@ -464,27 +490,18 @@ export default function Home() {
             <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 {calView === "month" && (
-                  <Calendar
-                    year={year}
-                    month={month}
-                    posts={posts}
-                    today={today}
+                  <Calendar year={year} month={month} posts={posts} today={today}
                     onDayClick={(d) => setSelectedDate((prev) => (prev === d ? null : d))}
                     onMovePost={handleMovePost}
                   />
                 )}
                 {calView === "week" && (
-                  <WeekView
-                    baseDate={selectedDate ?? today}
-                    posts={posts}
-                    today={today}
+                  <WeekView baseDate={selectedDate ?? today} posts={posts} today={today}
                     onDayClick={(d) => { setSelectedDate(d); setCalView("day"); }}
                   />
                 )}
                 {calView === "day" && (
-                  <DayView
-                    date={selectedDate ?? today}
-                    posts={posts}
+                  <DayView date={selectedDate ?? today} posts={posts}
                     onEdit={(post) => setEditingPost(post)}
                     onDelete={handleDeletePost}
                     onDuplicate={handleDuplicatePost}
@@ -503,48 +520,30 @@ export default function Home() {
                     onDuplicate={handleDuplicatePost}
                   />
                 )}
-                <PostForm
-                  defaultDate={selectedDate ?? today}
-                  onAdd={handleAddPost}
-                />
+                <PostForm defaultDate={selectedDate ?? today} onAdd={handleAddPost} />
               </div>
             </div>
           </>
         )}
       </main>
-      <EditPostModal
-        post={editingPost}
-        onClose={() => setEditingPost(null)}
-        onSave={handleUpdatePost}
-      />
+
+      <EditPostModal post={editingPost} onClose={() => setEditingPost(null)} onSave={handleUpdatePost} />
       {showOnboarding && (
-        <OnboardingModal
-          onComplete={() => {
-            setShowOnboarding(false);
-            if (user) localStorage.setItem(`postly_onboarded_${user.id}`, "1");
-          }}
-        />
+        <OnboardingModal onComplete={() => {
+          setShowOnboarding(false);
+          if (user) localStorage.setItem(`postly_onboarded_${user.id}`, "1");
+        }} />
       )}
 
-      {/* Toast notification */}
+      {/* Toast */}
       {toast && (
-        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 ${
-          toast.type === "error"
-            ? "bg-red-600 text-white"
-            : "bg-zinc-900 text-white"
-        }`}>
-          {toast.type === "error" ? (
-            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-            </svg>
-          ) : (
-            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-          )}
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-xl text-sm font-medium ${
+          toast.type === "error" ? "bg-rose-500 text-white" : "text-white"
+        }`} style={toast.type !== "error" ? {background:"var(--text-1)"} : undefined}>
+          <span>{toast.type === "error" ? "⚠️" : "✓"}</span>
           <span>{toast.message}</span>
           {toast.type === "error" && (
-            <a href="/pricing" className="ml-2 underline text-white/80 hover:text-white shrink-0">업그레이드 →</a>
+            <a href="/pricing" className="ml-2 underline opacity-80 hover:opacity-100 shrink-0">업그레이드 →</a>
           )}
         </div>
       )}

@@ -2,12 +2,135 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-body {
-  background: #f4f4f5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
+/* ── Diary color tokens ──────────────────────────────────── */
+:root {
+  --bg:        #FAFAF5;   /* warm ivory */
+  --bg-card:   #FFFFFF;
+  --bg-hover:  #F5F0E8;
+  --border:    #EAE4DA;
+  --border-light: #F0EBE1;
+
+  --text-1:    #292524;   /* stone-900 warm */
+  --text-2:    #78716C;   /* stone-500 warm */
+  --text-3:    #A9A29D;   /* stone-400 warm */
+
+  --accent:    #A78BFA;   /* lavender */
+  --accent-bg: #F5F0FF;
+  --accent-text: #7C3AED;
+
+  /* Platform pastels */
+  --ig-bg:     #FFF0F3;
+  --ig-border: #FCCDD8;
+  --ig-dot:    #FB7185;
+  --ig-text:   #BE185D;
+
+  --tw-bg:     #F0FFFE;
+  --tw-border: #99F6E4;
+  --tw-dot:    #2DD4BF;
+  --tw-text:   #0F766E;
+
+  --yt-bg:     #FFF5F5;
+  --yt-border: #FECACA;
+  --yt-dot:    #F87171;
+  --yt-text:   #B91C1C;
 }
 
-.dark body {
-  background: #09090b;
+.dark {
+  --bg:        #1C1917;   /* stone-950 warm */
+  --bg-card:   #292524;   /* stone-800 */
+  --bg-hover:  #312E2B;
+  --border:    #44403C;   /* stone-700 */
+  --border-light: #3C3836;
+
+  --text-1:    #FAFAF9;
+  --text-2:    #A9A29D;
+  --text-3:    #78716C;
+
+  --accent:    #A78BFA;
+  --accent-bg: #2E1F4A;
+  --accent-text: #C4B5FD;
+
+  --ig-bg:     #3B1927;
+  --ig-border: #6D2040;
+  --ig-dot:    #FB7185;
+  --ig-text:   #FDA4AF;
+
+  --tw-bg:     #0F2E2B;
+  --tw-border: #0D4F48;
+  --tw-dot:    #2DD4BF;
+  --tw-text:   #5EEAD4;
+
+  --yt-bg:     #2D1313;
+  --yt-border: #5B1F1F;
+  --yt-dot:    #F87171;
+  --yt-text:   #FCA5A5;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
+}
+
+/* ── Diary utility classes ───────────────────────────────── */
+.diary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.diary-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--text-1);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.diary-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.diary-input::placeholder {
+  color: var(--text-3);
+}
+
+/* ── Bounce animation for checkmark ─────────────────────── */
+@keyframes check-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.animate-check {
+  animation: check-bounce 0.4s ease-out forwards;
+}
+
+/* ── Fade-up for new items ───────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.25s ease-out;
 }

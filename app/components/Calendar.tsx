@@ -18,14 +18,7 @@ function toDateStr(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-export default function Calendar({
-  year,
-  month,
-  posts,
-  today,
-  onDayClick,
-  onMovePost,
-}: CalendarProps) {
+export default function Calendar({ year, month, posts, today, onDayClick, onMovePost }: CalendarProps) {
   const [draggingPostId, setDraggingPostId] = useState<string | null>(null);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
 
@@ -41,11 +34,9 @@ export default function Calendar({
     const prevYear = month === 0 ? year - 1 : year;
     cells.push({ day, thisMonth: false, dateStr: toDateStr(prevYear, prevMonth, day) });
   }
-
   for (let d = 1; d <= daysInMonth; d++) {
     cells.push({ day: d, thisMonth: true, dateStr: toDateStr(year, month, d) });
   }
-
   const trailing = 42 - cells.length;
   for (let d = 1; d <= trailing; d++) {
     const nextMonth = month === 11 ? 0 : month + 1;
@@ -60,26 +51,31 @@ export default function Calendar({
   }, {});
 
   return (
-    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
-      <div className="grid grid-cols-7 border-b border-zinc-100 dark:border-zinc-800">
+    <div className="overflow-hidden rounded-2xl" style={{background:"var(--bg-card)", border:"1px solid var(--border)"}}>
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7" style={{borderBottom:"1px solid var(--border-light)"}}>
         {WEEKDAYS.map((d, i) => (
           <div
             key={d}
-            className={`py-3 text-center text-xs font-semibold uppercase tracking-wide ${
-              i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-zinc-500 dark:text-zinc-400"
-            }`}
+            className="py-3 text-center text-xs font-semibold tracking-wide"
+            style={{
+              color: i === 0 ? "#FB7185" : i === 6 ? "#60A5FA" : "var(--text-3)",
+            }}
           >
             {d}
           </div>
         ))}
       </div>
 
+      {/* Cells */}
       <div className="grid grid-cols-7">
         {cells.map((cell, idx) => {
           const isToday = cell.dateStr === today;
           const dayPosts = postsByDate[cell.dateStr] || [];
           const isWeekend = idx % 7 === 0 || idx % 7 === 6;
           const isDragOver = dragOverDate === cell.dateStr;
+          const isSunday = idx % 7 === 0;
+          const isSaturday = idx % 7 === 6;
 
           return (
             <div
@@ -89,29 +85,46 @@ export default function Calendar({
               onDragLeave={() => setDragOverDate(null)}
               onDrop={(e) => {
                 e.preventDefault();
-                if (draggingPostId && onMovePost) {
-                  onMovePost(draggingPostId, cell.dateStr);
-                }
+                if (draggingPostId && onMovePost) onMovePost(draggingPostId, cell.dateStr);
                 setDraggingPostId(null);
                 setDragOverDate(null);
               }}
-              className={`min-h-[88px] p-2 text-left border-b border-r border-zinc-100 dark:border-zinc-800 transition-colors cursor-pointer relative
-                ${!cell.thisMonth ? "bg-zinc-50/60 dark:bg-zinc-950/60" : "hover:bg-zinc-50 dark:hover:bg-zinc-800"}
-                ${idx % 7 === 6 ? "border-r-0" : ""}
-                ${isDragOver ? "bg-indigo-50 dark:bg-indigo-950/40 ring-2 ring-inset ring-indigo-400" : ""}
-              `}
+              className="cursor-pointer transition-all"
+              style={{
+                minHeight: "84px",
+                padding: "8px",
+                borderBottom: "1px solid var(--border-light)",
+                borderRight: idx % 7 === 6 ? "none" : "1px solid var(--border-light)",
+                background: isDragOver
+                  ? "var(--accent-bg)"
+                  : !cell.thisMonth
+                  ? "color-mix(in srgb, var(--bg) 70%, transparent)"
+                  : undefined,
+                boxShadow: isDragOver ? "inset 0 0 0 2px var(--accent)" : undefined,
+              }}
+              onMouseEnter={e => { if (cell.thisMonth && !isDragOver) (e.currentTarget as HTMLElement).style.background = "var(--bg-hover)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isDragOver ? "var(--accent-bg)" : !cell.thisMonth ? "color-mix(in srgb, var(--bg) 70%, transparent)" : ""; }}
             >
+              {/* Day number */}
               <span
-                className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium
-                  ${isToday ? "bg-indigo-600 text-white" : ""}
-                  ${!isToday && isWeekend && cell.thisMonth ? (idx % 7 === 0 ? "text-red-400" : "text-blue-400") : ""}
-                  ${!isToday && !isWeekend && cell.thisMonth ? "text-zinc-800 dark:text-zinc-200" : ""}
-                  ${!cell.thisMonth && !isToday ? "text-zinc-300 dark:text-zinc-600" : ""}
-                `}
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
+                style={{
+                  background: isToday ? "var(--accent)" : undefined,
+                  color: isToday
+                    ? "white"
+                    : !cell.thisMonth
+                    ? "var(--text-3)"
+                    : isSunday
+                    ? "#FB7185"
+                    : isSaturday
+                    ? "#60A5FA"
+                    : "var(--text-1)",
+                }}
               >
                 {cell.day}
               </span>
 
+              {/* Post stickers */}
               {dayPosts.length > 0 && (
                 <div className="mt-1 flex flex-col gap-0.5">
                   {dayPosts.slice(0, 3).map((post, pi) => {
@@ -127,19 +140,18 @@ export default function Calendar({
                         }}
                         onDragEnd={() => { setDraggingPostId(null); setDragOverDate(null); }}
                         onClick={(e) => e.stopPropagation()}
-                        className={`flex items-center gap-1 rounded px-1 py-0.5 ${cfg.bg} cursor-grab active:cursor-grabbing ${
-                          draggingPostId === post.id ? "opacity-40" : ""
-                        }`}
+                        className={`flex items-center gap-1 rounded-md px-1 py-0.5 ${cfg.bg} cursor-grab active:cursor-grabbing ${draggingPostId === post.id ? "opacity-40" : ""}`}
+                        style={{border:`1px solid`, borderColor: "transparent"}}
                       >
                         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${cfg.dot}`} />
                         <span className={`truncate text-[10px] font-medium leading-none ${cfg.color}`}>
-                          {post.time} {post.content.slice(0, 12)}{post.content.length > 12 ? "…" : ""}
+                          {post.time} {post.content.slice(0, 10)}{post.content.length > 10 ? "…" : ""}
                         </span>
                       </div>
                     );
                   })}
                   {dayPosts.length > 3 && (
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 pl-1">+{dayPosts.length - 3}개 더</span>
+                    <span className="text-[10px] pl-1" style={{color:"var(--text-3)"}}>+{dayPosts.length - 3}개</span>
                   )}
                 </div>
               )}

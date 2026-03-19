@@ -1,157 +1,73 @@
 "use client";
 
-import Link from "next/link";
-import { ScheduledPost, PLATFORM_CONFIG } from "../types";
+import { ScheduledPost } from "../types";
 
 interface StatsCardsProps {
   posts: ScheduledPost[];
   today: string;
-  currentMonth: string; // YYYY-MM
+  currentMonth: string;
   userPlan: "free" | "pro" | "business";
 }
 
-const PLAN_LIMITS: Record<string, number> = {
-  free: 10,
-  pro: 100,
-  business: Infinity,
-};
+const PLAN_LIMITS = { free: 10, pro: 100, business: Infinity };
 
-export default function StatsCards({
-  posts,
-  today,
-  currentMonth,
-  userPlan,
-}: StatsCardsProps) {
+export default function StatsCards({ posts, today, currentMonth, userPlan }: StatsCardsProps) {
   const monthPosts = posts.filter((p) => p.scheduledAt.startsWith(currentMonth));
   const todayPosts = posts.filter((p) => p.scheduledAt === today);
+  const instagramCount = monthPosts.filter((p) => p.platform === "instagram").length;
+  const twitterCount   = monthPosts.filter((p) => p.platform === "twitter").length;
+  const youtubeCount   = monthPosts.filter((p) => p.platform === "youtube").length;
   const limit = PLAN_LIMITS[userPlan];
-  const usedCount = monthPosts.length;
-  const pct = limit === Infinity ? 0 : Math.min(100, Math.round((usedCount / limit) * 100));
-  const isNearLimit = limit !== Infinity && usedCount >= limit * 0.8;
-  const isAtLimit = limit !== Infinity && usedCount >= limit;
-
-  const allPlatforms = (["instagram", "twitter", "youtube"] as const);
-
-  const platformMonthCounts = allPlatforms.map((platform) => ({
-    platform,
-    count: monthPosts.filter((p) => p.platform === platform).length,
-  }));
-
-  const platformTotalCounts = allPlatforms.map((platform) => ({
-    platform,
-    count: posts.filter((p) => p.platform === platform).length,
-  }));
+  const usagePercent = limit === Infinity ? 0 : Math.min(100, (monthPosts.length / limit) * 100);
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-      {/* This month + usage */}
-      <div className="col-span-2 lg:col-span-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 shadow-sm">
-        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
-          이번 달 예약
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5 mb-5">
+      {/* This month */}
+      <div className="rounded-2xl p-4" style={{background:"var(--accent-bg)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)"}}>
+        <p className="text-xl mb-0.5">✍️</p>
+        <p className="text-2xl font-bold" style={{color:"var(--accent-text)"}}>{monthPosts.length}</p>
+        <p className="text-xs font-medium mt-0.5" style={{color:"var(--accent-text)", opacity:0.8}}>이번 달 기록</p>
+        <p className="text-[10px] mt-1" style={{color:"var(--accent-text)", opacity:0.55}}>
+          {limit === Infinity ? "무제한" : `${limit}개 중`}
         </p>
-        <p className="mt-1 text-4xl font-bold text-zinc-900 dark:text-zinc-100">
-          {usedCount}
-          {limit !== Infinity && (
-            <span className="ml-1 text-base font-normal text-zinc-400 dark:text-zinc-500">
-              / {limit}
-            </span>
-          )}
-        </p>
-
-        {/* Usage bar */}
         {limit !== Infinity && (
-          <div className="mt-2">
-            <div className="h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  isAtLimit ? "bg-red-500" : isNearLimit ? "bg-amber-400" : "bg-indigo-500"
-                }`}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-            {isAtLimit ? (
-              <p className="mt-1 text-[10px] text-red-500 font-medium">
-                한도 초과 —{" "}
-                <Link href="/pricing" className="underline hover:no-underline">업그레이드</Link>
-              </p>
-            ) : (
-              <p className={`mt-1 text-[10px] font-medium ${isNearLimit ? "text-amber-500" : "text-zinc-400 dark:text-zinc-500"}`}>
-                {limit - usedCount}개 남음
-              </p>
-            )}
+          <div className="mt-2 h-1 rounded-full overflow-hidden" style={{background:"color-mix(in srgb, var(--accent) 15%, transparent)"}}>
+            <div className="h-full rounded-full transition-all duration-500"
+              style={{width:`${usagePercent}%`, background: usagePercent > 85 ? "#F87171" : "var(--accent)"}} />
           </div>
         )}
-        {limit === Infinity && (
-          <p className="mt-1 text-[10px] text-indigo-500 font-medium">무제한 ✓</p>
-        )}
-
-        {/* Platform breakdown for month */}
-        <div className="mt-3 flex gap-1.5 flex-wrap">
-          {platformMonthCounts.map(({ platform, count }) => {
-            const cfg = PLATFORM_CONFIG[platform];
-            return (
-              <span
-                key={platform}
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.color}`}
-                title={`${cfg.label}: ${count}개`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
-                {count}
-              </span>
-            );
-          })}
-        </div>
       </div>
 
       {/* Today */}
-      <div className="col-span-2 lg:col-span-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 shadow-sm">
-        <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
-          오늘 예정
+      <div className="rounded-2xl p-4" style={{background:"#F0FDF9", border:"1px solid #A7F3D0"}}>
+        <p className="text-xl mb-0.5">📅</p>
+        <p className="text-2xl font-bold" style={{color:"#059669"}}>{todayPosts.length}</p>
+        <p className="text-xs font-medium mt-0.5" style={{color:"#059669", opacity:0.8}}>오늘 예정</p>
+        <p className="text-[10px] mt-1" style={{color:"#059669", opacity:0.6}}>
+          {todayPosts.length > 0 ? "오늘 파이팅 💪" : "아직 없어요"}
         </p>
-        <p className="mt-1 text-4xl font-bold text-zinc-900 dark:text-zinc-100">
-          {todayPosts.length}
-        </p>
-        <div className="mt-3 flex gap-1.5 flex-wrap min-h-[20px]">
-          {todayPosts.length === 0 ? (
-            <span className="text-xs text-zinc-400 dark:text-zinc-500">없음</span>
-          ) : (
-            allPlatforms.map((platform) => {
-              const count = todayPosts.filter((p) => p.platform === platform).length;
-              if (count === 0) return null;
-              const cfg = PLATFORM_CONFIG[platform];
-              return (
-                <span
-                  key={platform}
-                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${cfg.bg} ${cfg.color}`}
-                >
-                  <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
-                  {count}
-                </span>
-              );
-            })
-          )}
-        </div>
       </div>
 
-      {/* Platform breakdown — all 3 */}
-      {platformTotalCounts.map(({ platform, count }) => {
-        const cfg = PLATFORM_CONFIG[platform];
-        return (
-          <div
-            key={platform}
-            className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm"
-          >
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
-              <p className={`text-xs font-semibold uppercase tracking-wide ${cfg.color}`}>
-                {cfg.label}
-              </p>
-            </div>
-            <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">{count}</p>
-            <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">전체 예약</p>
-          </div>
-        );
-      })}
+      {/* Instagram */}
+      <div className="rounded-2xl p-4" style={{background:"var(--ig-bg)", border:"1px solid var(--ig-border)"}}>
+        <p className="text-xl mb-0.5">📸</p>
+        <p className="text-2xl font-bold" style={{color:"var(--ig-text)"}}>{instagramCount}</p>
+        <p className="text-[11px] font-medium mt-0.5" style={{color:"var(--ig-text)", opacity:0.75}}>Instagram</p>
+      </div>
+
+      {/* Twitter */}
+      <div className="rounded-2xl p-4" style={{background:"var(--tw-bg)", border:"1px solid var(--tw-border)"}}>
+        <p className="text-xl mb-0.5">🐦</p>
+        <p className="text-2xl font-bold" style={{color:"var(--tw-text)"}}>{twitterCount}</p>
+        <p className="text-[11px] font-medium mt-0.5" style={{color:"var(--tw-text)", opacity:0.75}}>Twitter / X</p>
+      </div>
+
+      {/* YouTube */}
+      <div className="rounded-2xl p-4" style={{background:"var(--yt-bg)", border:"1px solid var(--yt-border)"}}>
+        <p className="text-xl mb-0.5">🎬</p>
+        <p className="text-2xl font-bold" style={{color:"var(--yt-text)"}}>{youtubeCount}</p>
+        <p className="text-[11px] font-medium mt-0.5" style={{color:"var(--yt-text)", opacity:0.75}}>YouTube</p>
+      </div>
     </div>
   );
 }

@@ -29,33 +29,22 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
   const [bestTimeLoading, setBestTimeLoading] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAiGenerate() {
-    if (!topic.trim()) {
-      setError("주제를 입력해 주세요.");
-      return;
-    }
-    setAiLoading(true);
-    setError("");
+    if (!topic.trim()) { setError("주제를 입력해 주세요."); return; }
+    setAiLoading(true); setError("");
     try {
       const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic: topic.trim(), platform }),
       });
       const data = await res.json();
-      if (data.result) {
-        setContent(data.result);
-        setTopic("");
-      } else {
-        setError("AI 생성에 실패했습니다. 다시 시도해 주세요.");
-      }
-    } catch {
-      setError("AI 생성 중 오류가 발생했습니다.");
-    } finally {
-      setAiLoading(false);
-    }
+      if (data.result) { setContent(data.result); setTopic(""); }
+      else setError("AI 생성에 실패했습니다. 다시 시도해 주세요.");
+    } catch { setError("AI 생성 중 오류가 발생했습니다."); }
+    finally { setAiLoading(false); }
   }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -72,45 +61,35 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
     setHashtagLoading(true);
     try {
       const res = await fetch("/api/hashtags", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: content.trim(), platform }),
       });
       const data = await res.json();
       if (data.hashtags) setHashtags(data.hashtags);
-    } catch {
-      setError("해시태그 추천 실패. 다시 시도해주세요.");
-    } finally {
-      setHashtagLoading(false);
-    }
+    } catch { setError("해시태그 추천 실패."); }
+    finally { setHashtagLoading(false); }
   }
 
   async function handleBestTime() {
-    setBestTimeLoading(true);
-    setBestTimes([]);
+    setBestTimeLoading(true); setBestTimes([]);
     try {
       const res = await fetch("/api/best-time", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ platform }),
       });
       const data = await res.json();
       if (data.times) setBestTimes(data.times);
-    } catch {
-      // silent fail
-    } finally {
-      setBestTimeLoading(false);
-    }
+    } catch { /* silent */ }
+    finally { setBestTimeLoading(false); }
   }
 
   function addHashtag(tag: string) {
-    setContent((prev) => prev.trim() + " " + tag);
-    setHashtags((prev) => prev.filter((t) => t !== tag));
+    setContent(prev => prev.trim() + " " + tag);
+    setHashtags(prev => prev.filter(t => t !== tag));
   }
 
   function removeImage() {
-    setImageFile(null);
-    setImagePreview(null);
+    setImageFile(null); setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
@@ -120,26 +99,17 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
     if (!date) { setError("날짜를 선택해 주세요."); return; }
 
     let imageUrl: string | undefined;
-
     if (imageFile) {
       setImageUploading(true);
       const ext = imageFile.name.split(".").pop();
       const path = `posts/${crypto.randomUUID()}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("post-images")
-        .upload(path, imageFile);
-
-      if (uploadError) {
-        setError("이미지 업로드에 실패했어요.");
-        setImageUploading(false);
-        return;
-      }
+      const { error: uploadError } = await supabase.storage.from("post-images").upload(path, imageFile);
+      if (uploadError) { setError("이미지 업로드에 실패했어요."); setImageUploading(false); return; }
       const { data } = supabase.storage.from("post-images").getPublicUrl(path);
       imageUrl = data.publicUrl;
       setImageUploading(false);
     }
 
-    // 반복 예약: 최대 8주치 포스트 생성
     const dates: string[] = [date];
     if (repeat !== "none") {
       const base = new Date(date);
@@ -154,316 +124,250 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
     }
 
     for (const d of dates) {
-      const post: ScheduledPost = {
-        id: crypto.randomUUID(),
-        content: content.trim(),
-        platform,
-        scheduledAt: d,
-        time,
-        createdAt: new Date().toISOString(),
-        imageUrl,
-        tags: tags.length > 0 ? [...tags] : undefined,
-      };
-      onAdd(post);
+      onAdd({
+        id: crypto.randomUUID(), content: content.trim(), platform,
+        scheduledAt: d, time, createdAt: new Date().toISOString(),
+        imageUrl, tags: tags.length > 0 ? [...tags] : undefined,
+      });
     }
 
-    setContent("");
-    setError("");
-    setRepeat("none");
-    setTags([]);
-    setTagInput("");
-    removeImage();
+    setContent(""); setError(""); setRepeat("none");
+    setTags([]); setTagInput(""); removeImage(); setShowOptions(false);
   }
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm p-5"
-    >
-      <h2 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 mb-4">새 포스트 예약</h2>
+  const cfg = PLATFORM_CONFIG[platform];
 
-      {/* Platform selector */}
-      <div className="flex gap-2 mb-4">
+  return (
+    <form onSubmit={handleSubmit} className="rounded-2xl overflow-hidden" style={{background:"var(--bg-card)", border:"1px solid var(--border)"}}>
+      {/* Platform tabs */}
+      <div className="flex" style={{borderBottom:"1px solid var(--border-light)"}}>
         {(["instagram", "twitter", "youtube"] as Platform[]).map((p) => {
-          const cfg = PLATFORM_CONFIG[p];
-          const selected = platform === p;
+          const c = PLATFORM_CONFIG[p];
+          const active = platform === p;
           return (
             <button
               key={p}
               type="button"
               onClick={() => setPlatform(p)}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border transition-all
-                ${
-                  selected
-                    ? `${cfg.bg} ${cfg.color} ${cfg.border} shadow-sm`
-                    : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-600 hover:border-zinc-300 dark:hover:border-zinc-500"
-                }`}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-all"
+              style={{
+                background: active ? "var(--bg)" : undefined,
+                color: active ? "var(--text-1)" : "var(--text-3)",
+                borderBottom: active ? `2px solid var(--accent)` : "2px solid transparent",
+              }}
             >
-              <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
-              {cfg.label}
+              <span className={`h-2 w-2 rounded-full ${c.dot}`} />
+              {c.emoji} {p === "instagram" ? "Instagram" : p === "twitter" ? "Twitter" : "YouTube"}
             </button>
           );
         })}
       </div>
 
-      {/* AI 글쓰기 */}
-      <div className="mb-3 rounded-xl border border-indigo-100 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/50 p-3">
-        <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-400 mb-2 flex items-center gap-1">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-          </svg>
-          AI 글쓰기
-        </p>
-        <div className="flex gap-2">
+      <div className="p-4">
+        {/* AI writing */}
+        <div className="mb-3 flex gap-2">
           <input
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAiGenerate())}
-            placeholder="주제 입력 (예: 봄 신상품 출시)"
-            className="flex-1 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-zinc-800 px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="✨ AI 글쓰기 — 주제 입력 후 Enter"
+            className="diary-input flex-1 px-3 py-2 text-xs"
           />
           <button
             type="button"
             onClick={handleAiGenerate}
             disabled={aiLoading}
-            className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-1"
+            className="rounded-xl px-3 py-2 text-xs font-semibold text-white transition-colors disabled:opacity-50 flex items-center gap-1"
+            style={{background:"var(--accent)"}}
           >
             {aiLoading ? (
-              <>
-                <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                생성 중
-              </>
+              <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
             ) : "생성"}
           </button>
         </div>
-      </div>
 
-      {/* Content textarea */}
-      <textarea
-        value={content}
-        onChange={(e) => {
-          setContent(e.target.value);
-          setError("");
-        }}
-        placeholder="포스트 내용을 입력하거나 AI로 생성하세요…"
-        rows={4}
-        className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition"
-      />
-
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-
-      {/* 링크 미리보기 */}
-      <LinkPreview content={content} />
-
-      {/* 해시태그 추천 */}
-      <div className="mt-2">
-        <button
-          type="button"
-          onClick={handleHashtagSuggest}
-          disabled={hashtagLoading}
-          className="text-xs text-indigo-500 hover:text-indigo-700 font-medium flex items-center gap-1 disabled:opacity-50"
-        >
-          {hashtagLoading ? (
-            <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-          ) : "# "}
-          {hashtagLoading ? "해시태그 추천 중..." : "AI 해시태그 추천"}
-        </button>
-        {hashtags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {hashtags.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => addHashtag(tag)}
-                className="rounded-full bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-2.5 py-1 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors"
-              >
-                {tag} +
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Image upload */}
-      <div className="mt-3">
-        {imagePreview ? (
-          <div className="relative rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700">
-            <img src={imagePreview} alt="preview" className="w-full h-36 object-cover" />
-            <button
-              type="button"
-              onClick={removeImage}
-              className="absolute top-2 right-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/70 transition-colors"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full rounded-xl border border-dashed border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800 py-3 text-xs text-zinc-400 hover:border-indigo-300 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 21h18M5.25 6.75h.008v.008H5.25V6.75zm0 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
-            </svg>
-            이미지 첨부 (선택, 최대 5MB)
-          </button>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="hidden"
+        {/* Textarea — the main writing space */}
+        <textarea
+          value={content}
+          onChange={(e) => { setContent(e.target.value); setError(""); }}
+          placeholder="오늘 올릴 내용을 써보세요…"
+          rows={5}
+          className="diary-input w-full px-4 py-3 text-sm resize-none"
+          style={{lineHeight: "1.7"}}
         />
-      </div>
 
-      {/* 반복 예약 */}
-      <div className="mt-3">
-        <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">반복</label>
-        <div className="flex gap-2">
-          {(["none", "daily", "weekly", "monthly"] as const).map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setRepeat(r)}
-              className={`flex-1 rounded-lg py-1.5 text-xs font-semibold border transition-all ${
-                repeat === r
-                  ? "bg-indigo-600 text-white border-indigo-600"
-                  : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-600 hover:border-zinc-300 dark:hover:border-zinc-500"
-              }`}
-            >
-              {r === "none" ? "없음" : r === "daily" ? "매일" : r === "weekly" ? "매주" : "매월"}
-            </button>
-          ))}
-        </div>
-        {repeat !== "none" && (
-          <p className="mt-1 text-xs text-indigo-500 dark:text-indigo-400">
-            {repeat === "daily" ? "14일간 매일" : repeat === "weekly" ? "8주간 매주" : "3개월간 매월"} 자동 등록됩니다
-          </p>
-        )}
-      </div>
+        {error && <p className="mt-1.5 text-xs" style={{color:"#F87171"}}>{error}</p>}
 
-      {/* 태그 */}
-      <div className="mt-3">
-        <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">태그</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if ((e.key === "Enter" || e.key === ",") && tagInput.trim()) {
-                e.preventDefault();
-                const t = tagInput.trim().replace(/^#/, "");
-                if (t && !tags.includes(t)) setTags((prev) => [...prev, t]);
-                setTagInput("");
-              } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
-                setTags((prev) => prev.slice(0, -1));
-              }
-            }}
-            placeholder="Enter 또는 쉼표로 태그 추가"
-            className="flex-1 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-          />
-        </div>
-        {tags.length > 0 && (
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 text-xs text-zinc-600 dark:text-zinc-300"
-              >
-                #{tag}
-                <button
-                  type="button"
-                  onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
-                  className="text-zinc-400 hover:text-red-500 transition-colors leading-none"
-                >
-                  ×
+        <LinkPreview content={content} />
+
+        {/* Hashtag suggestions */}
+        <div className="mt-2">
+          <button type="button" onClick={handleHashtagSuggest} disabled={hashtagLoading}
+            className="text-xs font-medium flex items-center gap-1 transition-colors disabled:opacity-50"
+            style={{color:"var(--accent)"}}>
+            {hashtagLoading ? (
+              <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : "#"} {hashtagLoading ? "추천 중..." : "AI 해시태그 추천"}
+          </button>
+          {hashtags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {hashtags.map(tag => (
+                <button key={tag} type="button" onClick={() => addHashtag(tag)}
+                  className="rounded-full px-2.5 py-1 text-xs transition-colors"
+                  style={{background:"var(--accent-bg)", color:"var(--accent-text)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)"}}>
+                  {tag} +
                 </button>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Date & time */}
-      <div className="mt-3 flex gap-3">
-        <div className="flex-1">
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">날짜</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-          />
-        </div>
-        <div className="w-32">
-          <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">시간</label>
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-          />
-        </div>
-      </div>
-
-      {/* AI 최적 게시 시간 */}
-      <div className="mt-2">
-        <button
-          type="button"
-          onClick={handleBestTime}
-          disabled={bestTimeLoading}
-          className="text-xs text-indigo-500 hover:text-indigo-700 font-medium flex items-center gap-1 disabled:opacity-50"
-        >
-          {bestTimeLoading ? (
-            <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-          ) : (
-            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
+              ))}
+            </div>
           )}
-          {bestTimeLoading ? "AI 분석 중..." : "AI 최적 게시 시간"}
-        </button>
-        {bestTimes.length > 0 && (
-          <div className="mt-2 flex flex-col gap-1.5">
-            {bestTimes.map((t) => (
-              <button
-                key={t.time}
-                type="button"
-                onClick={() => { setTime(t.time); setBestTimes([]); }}
-                className="flex items-center justify-between rounded-lg border border-indigo-100 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/50 px-3 py-1.5 text-left hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors group"
-              >
-                <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400">{t.time}</span>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 flex-1 mx-2 truncate">{t.reason}</span>
-                <span className="text-[10px] text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">적용 →</span>
+        </div>
+
+        {/* Image */}
+        <div className="mt-3">
+          {imagePreview ? (
+            <div className="relative rounded-xl overflow-hidden" style={{border:"1px solid var(--border)"}}>
+              <img src={imagePreview} alt="preview" className="w-full h-32 object-cover" />
+              <button type="button" onClick={removeImage}
+                className="absolute top-2 right-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/70 transition-colors">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-            ))}
+            </div>
+          ) : (
+            <button type="button" onClick={() => fileInputRef.current?.click()}
+              className="w-full rounded-xl py-2.5 text-xs flex items-center justify-center gap-2 transition-colors"
+              style={{border:"1px dashed var(--border)", color:"var(--text-3)"}}>
+              🖼️ 이미지 첨부 (선택, 최대 5MB)
+            </button>
+          )}
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+        </div>
+
+        {/* Date & time (always visible) */}
+        <div className="mt-3 flex gap-2">
+          <div className="flex-1">
+            <label className="block text-[10px] font-medium mb-1" style={{color:"var(--text-3)"}}>날짜</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+              className="diary-input w-full px-3 py-2 text-sm" />
+          </div>
+          <div className="w-28">
+            <label className="block text-[10px] font-medium mb-1" style={{color:"var(--text-3)"}}>시간</label>
+            <input type="time" value={time} onChange={(e) => setTime(e.target.value)}
+              className="diary-input w-full px-3 py-2 text-sm" />
+          </div>
+        </div>
+
+        {/* AI best time */}
+        <div className="mt-2">
+          <button type="button" onClick={handleBestTime} disabled={bestTimeLoading}
+            className="text-xs font-medium flex items-center gap-1 disabled:opacity-50 transition-colors"
+            style={{color:"var(--accent)"}}>
+            {bestTimeLoading ? (
+              <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : "🕐"} {bestTimeLoading ? "AI 분석 중..." : "AI 최적 게시 시간"}
+          </button>
+          {bestTimes.length > 0 && (
+            <div className="mt-2 flex flex-col gap-1.5">
+              {bestTimes.map(t => (
+                <button key={t.time} type="button" onClick={() => { setTime(t.time); setBestTimes([]); }}
+                  className="flex items-center justify-between rounded-xl px-3 py-2 text-left transition-colors group"
+                  style={{background:"var(--accent-bg)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)"}}>
+                  <span className="text-xs font-bold" style={{color:"var(--accent-text)"}}>{t.time}</span>
+                  <span className="text-[10px] flex-1 mx-2 truncate" style={{color:"var(--text-2)"}}>{t.reason}</span>
+                  <span className="text-[10px] opacity-0 group-hover:opacity-100 transition-opacity" style={{color:"var(--accent)"}}>적용 →</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Expandable options */}
+        <button type="button" onClick={() => setShowOptions(v => !v)}
+          className="mt-3 flex items-center gap-1 text-xs transition-colors"
+          style={{color:"var(--text-3)"}}>
+          <span className={`transition-transform ${showOptions ? "rotate-90" : ""}`}>›</span>
+          {showOptions ? "옵션 접기" : "반복 예약 · 태그"}
+        </button>
+
+        {showOptions && (
+          <div className="mt-3 space-y-3 animate-fade-up">
+            {/* Repeat */}
+            <div>
+              <label className="block text-[10px] font-medium mb-1.5" style={{color:"var(--text-3)"}}>반복</label>
+              <div className="flex gap-1.5">
+                {(["none", "daily", "weekly", "monthly"] as const).map(r => (
+                  <button key={r} type="button" onClick={() => setRepeat(r)}
+                    className="flex-1 rounded-full py-1.5 text-xs font-medium transition-all"
+                    style={repeat === r
+                      ? {background:"var(--accent)", color:"white"}
+                      : {background:"var(--bg-hover)", color:"var(--text-2)", border:"1px solid var(--border)"}}>
+                    {r === "none" ? "없음" : r === "daily" ? "매일" : r === "weekly" ? "매주" : "매월"}
+                  </button>
+                ))}
+              </div>
+              {repeat !== "none" && (
+                <p className="mt-1 text-[10px]" style={{color:"var(--accent-text)"}}>
+                  {repeat === "daily" ? "14일간 매일" : repeat === "weekly" ? "8주간 매주" : "3개월간 매월"} 자동 등록
+                </p>
+              )}
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="block text-[10px] font-medium mb-1.5" style={{color:"var(--text-3)"}}>태그</label>
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.key === "Enter" || e.key === ",") && tagInput.trim()) {
+                    e.preventDefault();
+                    const t = tagInput.trim().replace(/^#/, "");
+                    if (t && !tags.includes(t)) setTags(prev => [...prev, t]);
+                    setTagInput("");
+                  } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
+                    setTags(prev => prev.slice(0, -1));
+                  }
+                }}
+                placeholder="Enter 또는 쉼표로 태그 추가"
+                className="diary-input w-full px-3 py-2 text-xs"
+              />
+              {tags.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {tags.map(tag => (
+                    <span key={tag} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+                      style={{background:"var(--bg-hover)", color:"var(--text-2)", border:"1px solid var(--border)"}}>
+                      #{tag}
+                      <button type="button" onClick={() => setTags(prev => prev.filter(t => t !== tag))}
+                        className="transition-colors" style={{color:"var(--text-3)"}}>×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
-      </div>
 
-      <button
-        type="submit"
-        disabled={imageUploading}
-        className="mt-4 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:opacity-60"
-      >
-        {imageUploading ? "이미지 업로드 중..." : "예약 등록"}
-      </button>
+        <button
+          type="submit"
+          disabled={imageUploading}
+          className="mt-4 w-full rounded-xl py-3 text-sm font-semibold text-white transition-colors disabled:opacity-60"
+          style={{background: cfg ? undefined : "var(--accent)"}}
+        >
+          {imageUploading ? "이미지 업로드 중..." : "📌 예약 등록"}
+        </button>
+      </div>
     </form>
   );
 }
