@@ -95,10 +95,10 @@ export default function Calendar({
                 setDraggingPostId(null);
                 setDragOverDate(null);
               }}
-              className={`min-h-[88px] p-2 text-left border-b border-r border-zinc-100 dark:border-zinc-800 transition-colors cursor-pointer
+              className={`min-h-[88px] p-2 text-left border-b border-r border-zinc-100 dark:border-zinc-800 transition-colors cursor-pointer relative
                 ${!cell.thisMonth ? "bg-zinc-50/60 dark:bg-zinc-950/60" : "hover:bg-zinc-50 dark:hover:bg-zinc-800"}
                 ${idx % 7 === 6 ? "border-r-0" : ""}
-                ${isDragOver ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 border-2" : ""}
+                ${isDragOver ? "bg-indigo-50 dark:bg-indigo-950/40 ring-2 ring-inset ring-indigo-400" : ""}
               `}
             >
               <span

@@ -3,17 +3,19 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+const PLATFORM_NAME: Record<string, string> = {
+  instagram: "Instagram",
+  twitter: "Twitter/X",
+  youtube: "YouTube",
+};
+
 export async function POST(req: NextRequest) {
   try {
     const { platform } = await req.json();
-
-    const platformName =
-      platform === "instagram" ? "Instagram"
-      : platform === "twitter" ? "Twitter/X"
-      : "YouTube";
+    const platformName = PLATFORM_NAME[platform] ?? "Instagram";
 
     const message = await client.messages.create({
-      model: "claude-opus-4-5",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 256,
       messages: [
         {
@@ -27,11 +29,14 @@ export async function POST(req: NextRequest) {
 
     const text = message.content[0].type === "text" ? message.content[0].text : "";
     const jsonMatch = text.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) return NextResponse.json({ error: "파싱 실패" }, { status: 500 });
+    if (!jsonMatch) return NextResponse.json({ error: "응답 파싱 실패" }, { status: 500 });
 
     const times = JSON.parse(jsonMatch[0]);
+    if (!Array.isArray(times)) return NextResponse.json({ error: "잘못된 응답 형식" }, { status: 500 });
+
     return NextResponse.json({ times });
-  } catch {
+  } catch (err) {
+    console.error("[best-time] error:", err);
     return NextResponse.json({ error: "AI 추천 실패" }, { status: 500 });
   }
 }
