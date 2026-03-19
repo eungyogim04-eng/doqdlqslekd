@@ -255,34 +255,26 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
-              <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </div>
-            <span className="text-base font-bold text-zinc-900 dark:text-zinc-100">Postly</span>
-          </div>
+      <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 h-13 sm:px-6" style={{height: "52px"}}>
+          {/* Logo */}
+          <span className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Postly</span>
 
-          <nav className="flex items-center gap-1 text-sm">
-            <Link href="/dashboard" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50 dark:bg-indigo-950">캘린더</Link>
-            <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">분석</Link>
-            <Link href="/team" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">팀</Link>
-            <Link href="/approvals" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">승인</Link>
-                    <Link href="/referral" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">친구초대</Link>
-            <Link href="/settings" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">설정</Link>
+          {/* Nav */}
+          <nav className="hidden sm:flex items-center gap-6 text-sm">
+            <Link href="/dashboard" className="font-medium text-zinc-900 dark:text-zinc-100">캘린더</Link>
+            <Link href="/analytics" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">분석</Link>
+            <Link href="/team" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">팀</Link>
+            <Link href="/approvals" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">승인</Link>
+            <Link href="/settings" className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">설정</Link>
           </nav>
 
-          <div className="flex items-center gap-3">
-            {/* Dark mode toggle */}
+          {/* Right actions */}
+          <div className="flex items-center gap-2">
+            {/* Dark mode */}
             <button
               onClick={toggleDark}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               title={dark ? "라이트 모드" : "다크 모드"}
             >
               {dark ? (
@@ -299,10 +291,10 @@ export default function Home() {
                 </svg>
               )}
             </button>
-            {/* Search toggle button */}
+            {/* Search */}
             <button
               onClick={() => { setShowSearch((v) => !v); setSearchQuery(""); }}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${showSearch ? "border-indigo-300 bg-indigo-50 dark:bg-indigo-950 text-indigo-600" : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${showSearch ? "text-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
               title="검색"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -310,27 +302,25 @@ export default function Home() {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
-            {user && (
-              <span className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-[140px]">
-                {user.email}
+
+            <div className="w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1" />
+
+            {userPlan === "free" ? (
+              <Link href="/pricing" className="rounded-lg bg-zinc-900 dark:bg-white px-3.5 py-1.5 text-xs font-semibold text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-100 transition-colors">
+                업그레이드
+              </Link>
+            ) : (
+              <span className="rounded-lg bg-indigo-50 dark:bg-indigo-950 px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 capitalize">
+                {userPlan}
               </span>
             )}
+
             <button
               onClick={handleLogout}
-              className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-1.5 text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               로그아웃
             </button>
-            {userPlan === "free" && (
-              <Link href="/pricing" className="rounded-xl bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-                업그레이드 ✨
-              </Link>
-            )}
-            {userPlan !== "free" && (
-              <span className="rounded-xl bg-indigo-100 dark:bg-indigo-950 px-4 py-1.5 text-sm font-semibold text-indigo-700 dark:text-indigo-300 capitalize">
-                {userPlan} 플랜 ✓
-              </span>
-            )}
           </div>
         </div>
       </header>
@@ -449,28 +439,25 @@ export default function Home() {
 
             <div className="mt-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <button onClick={prevMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">‹</button>
-                <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{year}년 {MONTH_NAMES[month]}</h2>
-                <button onClick={nextMonth} className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">›</button>
+                <button onClick={prevMonth} className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-lg leading-none">‹</button>
+                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">{year}년 {MONTH_NAMES[month]}</h2>
+                <button onClick={nextMonth} className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-lg leading-none">›</button>
+                <button onClick={goToday} className="ml-1 rounded-md px-2.5 py-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">오늘</button>
               </div>
-              <div className="flex items-center gap-2">
-                {/* View tabs */}
-                <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-                  {(["month", "week", "day"] as const).map((v) => (
-                    <button
-                      key={v}
-                      onClick={() => setCalView(v)}
-                      className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                        calView === v
-                          ? "bg-indigo-600 text-white"
-                          : "bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
-                      }`}
-                    >
-                      {v === "month" ? "월" : v === "week" ? "주" : "일"}
-                    </button>
-                  ))}
-                </div>
-                <button onClick={goToday} className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">오늘</button>
+              <div className="flex items-center gap-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-0.5">
+                {(["month", "week", "day"] as const).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setCalView(v)}
+                    className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                      calView === v
+                        ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm"
+                        : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    {v === "month" ? "월" : v === "week" ? "주" : "일"}
+                  </button>
+                ))}
               </div>
             </div>
 
