@@ -363,7 +363,7 @@ export default function PostForm({ defaultDate, onAdd }: PostFormProps) {
           type="submit"
           disabled={imageUploading}
           className="mt-4 w-full rounded-xl py-3 text-sm font-semibold text-white transition-colors disabled:opacity-60"
-          style={{background: cfg ? undefined : "var(--accent)"}}
+          style={{background: "var(--accent)"}}
         >
           {imageUploading ? "이미지 업로드 중..." : "📌 예약 등록"}
         </button>

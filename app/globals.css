@@ -4,93 +4,87 @@
 
 /* ── Diary color tokens ──────────────────────────────────── */
 :root {
-  --bg:        #FAFAF5;   /* warm ivory */
-  --bg-card:   #FFFFFF;
-  --bg-hover:  #F5F0E8;
-  --border:    #EAE4DA;
-  --border-light: #F0EBE1;
+  --bg:          #F5EFE6;   /* warm cream — distinctly warm */
+  --bg-card:     #FDFAF6;   /* slightly off-white */
+  --bg-hover:    #EDE4D8;
+  --border:      #DDD5C8;
+  --border-light:#E8E0D4;
 
-  --text-1:    #292524;   /* stone-900 warm */
-  --text-2:    #78716C;   /* stone-500 warm */
-  --text-3:    #A9A29D;   /* stone-400 warm */
+  --text-1:      #2C2420;   /* warm dark brown */
+  --text-2:      #7A6E67;
+  --text-3:      #B0A49C;
 
-  --accent:    #A78BFA;   /* lavender */
-  --accent-bg: #F5F0FF;
-  --accent-text: #7C3AED;
+  --accent:      #9B7FE8;   /* soft lavender-purple */
+  --accent-bg:   #F0EBFF;
+  --accent-text: #6D3FD1;
 
   /* Platform pastels */
-  --ig-bg:     #FFF0F3;
-  --ig-border: #FCCDD8;
-  --ig-dot:    #FB7185;
-  --ig-text:   #BE185D;
+  --ig-bg:       #FFF0F4;
+  --ig-border:   #FFCDD9;
+  --ig-dot:      #F472B6;
+  --ig-text:     #C2185B;
 
-  --tw-bg:     #F0FFFE;
-  --tw-border: #99F6E4;
-  --tw-dot:    #2DD4BF;
-  --tw-text:   #0F766E;
+  --tw-bg:       #EDFCFA;
+  --tw-border:   #99EFE4;
+  --tw-dot:      #2DD4BF;
+  --tw-text:     #0D7A72;
 
-  --yt-bg:     #FFF5F5;
-  --yt-border: #FECACA;
-  --yt-dot:    #F87171;
-  --yt-text:   #B91C1C;
+  --yt-bg:       #FFF3F3;
+  --yt-border:   #FFBDBD;
+  --yt-dot:      #F87171;
+  --yt-text:     #C62828;
 }
 
 .dark {
-  --bg:        #1C1917;   /* stone-950 warm */
-  --bg-card:   #292524;   /* stone-800 */
-  --bg-hover:  #312E2B;
-  --border:    #44403C;   /* stone-700 */
-  --border-light: #3C3836;
+  --bg:          #1E1916;
+  --bg-card:     #28231F;
+  --bg-hover:    #332D28;
+  --border:      #453D37;
+  --border-light:#3A342F;
 
-  --text-1:    #FAFAF9;
-  --text-2:    #A9A29D;
-  --text-3:    #78716C;
+  --text-1:      #F5EFE6;
+  --text-2:      #A8998F;
+  --text-3:      #6E625A;
 
-  --accent:    #A78BFA;
-  --accent-bg: #2E1F4A;
+  --accent:      #A78BFA;
+  --accent-bg:   #2A1F45;
   --accent-text: #C4B5FD;
 
-  --ig-bg:     #3B1927;
-  --ig-border: #6D2040;
-  --ig-dot:    #FB7185;
-  --ig-text:   #FDA4AF;
+  --ig-bg:       #3D1827;
+  --ig-border:   #7A2545;
+  --ig-dot:      #F472B6;
+  --ig-text:     #F9A8D4;
 
-  --tw-bg:     #0F2E2B;
-  --tw-border: #0D4F48;
-  --tw-dot:    #2DD4BF;
-  --tw-text:   #5EEAD4;
+  --tw-bg:       #0F2E2B;
+  --tw-border:   #0D4F48;
+  --tw-dot:      #2DD4BF;
+  --tw-text:     #5EEAD4;
 
-  --yt-bg:     #2D1313;
-  --yt-border: #5B1F1F;
-  --yt-dot:    #F87171;
-  --yt-text:   #FCA5A5;
+  --yt-bg:       #2D1313;
+  --yt-border:   #5B1F1F;
+  --yt-dot:      #F87171;
+  --yt-text:     #FCA5A5;
 }
 
 /* ── Base ────────────────────────────────────────────────── */
+html {
+  background: var(--bg);
+}
+
 body {
   background: var(--bg);
   color: var(--text-1);
-  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont,
-    "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-family: var(--font-sans), "Apple SD Gothic Neo", "Malgun Gothic",
+    -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 99px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-3);
-}
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 
 /* ── Diary utility classes ───────────────────────────────── */
 .diary-card {
@@ -105,32 +99,30 @@ body {
   border-radius: 0.75rem;
   color: var(--text-1);
   transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
 }
 .diary-input:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
 }
-.diary-input::placeholder {
-  color: var(--text-3);
-}
+.diary-input::placeholder { color: var(--text-3); }
 
-/* ── Bounce animation for checkmark ─────────────────────── */
+/* Override Tailwind bg-white / bg-zinc that slip through */
+.bg-white { background-color: var(--bg-card) !important; }
+.bg-zinc-50, .bg-zinc-100 { background-color: var(--bg) !important; }
+
+/* ── Micro-animations ────────────────────────────────────── */
 @keyframes check-bounce {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.3); }
   70%  { transform: scale(0.9); }
   100% { transform: scale(1); }
 }
-.animate-check {
-  animation: check-bounce 0.4s ease-out forwards;
-}
+.animate-check { animation: check-bounce 0.4s ease-out forwards; }
 
-/* ── Fade-up for new items ───────────────────────────────── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.animate-fade-up {
-  animation: fade-up 0.25s ease-out;
-}
+.animate-fade-up { animation: fade-up 0.25s ease-out; }

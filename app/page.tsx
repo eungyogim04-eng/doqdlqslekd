@@ -6,32 +6,27 @@ const features = [
     title: "캘린더 하나로 세 플랫폼 관리",
     desc: "월·주·일 캘린더에서 Instagram, Twitter/X, YouTube 포스트를 한눈에 확인하세요. 드래그 앤 드롭으로 일정을 즉시 변경할 수 있어요.",
     visual: (
-      <div className="rounded-xl bg-zinc-950 p-4 font-mono text-xs">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="h-2 w-2 rounded-full bg-red-500" />
-          <div className="h-2 w-2 rounded-full bg-yellow-500" />
-          <div className="h-2 w-2 rounded-full bg-green-500" />
-          <span className="ml-2 text-zinc-500 text-[10px]">postly / calendar</span>
+      <div className="rounded-2xl overflow-hidden" style={{background:"#FDFAF6", border:"1px solid #DDD5C8"}}>
+        <div className="px-4 pt-4 pb-3" style={{borderBottom:"1px solid #E8E0D4"}}>
+          <p className="text-xs font-semibold" style={{color:"#7A6E67"}}>3월 · 2026</p>
         </div>
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {["일","월","화","수","목","금","토"].map(d => (
-            <div key={d} className="text-center text-zinc-600 text-[9px] py-1">{d}</div>
+        <div className="grid grid-cols-7 gap-px p-3" style={{background:"#E8E0D4"}}>
+          {["일","월","화","수","목","금","토"].map((d,i) => (
+            <div key={d} className="bg-transparent text-center py-1 text-[9px] font-semibold" style={{color: i===0?"#F472B6":i===6?"#60A5FA":"#B0A49C"}}>{d}</div>
           ))}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {Array.from({length: 35}, (_, i) => {
-            const day = i - 2;
-            const dots: {color: string}[] = [];
-            if ([4,5,11,18,25].includes(i)) dots.push({color: "bg-pink-500"});
-            if ([6,13,20,27].includes(i)) dots.push({color: "bg-sky-500"});
-            if ([10,17,24].includes(i)) dots.push({color: "bg-red-500"});
-            const isToday = i === 18;
+          {Array.from({length:35},(_,i)=>{
+            const day=i-2; const isToday=i===20;
+            const hasPost=[4,7,11,14,18,20,25,28].includes(i);
             return (
-              <div key={i} className={`rounded py-1.5 text-center text-[9px] relative ${isToday ? "bg-indigo-600 text-white" : day < 1 || day > 31 ? "text-zinc-700" : "text-zinc-400"}`}>
-                {day > 0 && day <= 31 ? day : ""}
-                {dots.length > 0 && !isToday && (
+              <div key={i} className="py-2.5 text-center relative" style={{background:"#FDFAF6"}}>
+                <span className="text-[10px]" style={{
+                  color: isToday?"white":day<1||day>31?"#DDD5C8":i%7===0?"#F472B6":i%7===6?"#60A5FA":"#2C2420",
+                  background: isToday?"#9B7FE8":"transparent",
+                  borderRadius:"50%", padding:"2px 4px", fontWeight: isToday?700:400
+                }}>{day>0&&day<=31?day:""}</span>
+                {hasPost&&day>0&&day<=31&&!isToday&&(
                   <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex gap-px">
-                    {dots.map((d, di) => <div key={di} className={`h-1 w-1 rounded-full ${d.color}`} />)}
+                    <div className="h-1 w-1 rounded-full" style={{background:i%3===0?"#F472B6":i%3===1?"#2DD4BF":"#F87171"}} />
                   </div>
                 )}
               </div>
@@ -46,20 +41,22 @@ const features = [
     title: "주제만 입력하면 글이 완성돼요",
     desc: "Claude AI가 플랫폼 특성에 맞는 글을 자동으로 작성해드려요. 해시태그 추천, 최적 게시 시간 분석까지 한 번에.",
     visual: (
-      <div className="rounded-xl bg-zinc-950 p-4 space-y-3">
-        <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-          <p className="text-zinc-500 text-[10px] mb-1.5">주제</p>
-          <p className="text-zinc-300 text-xs">봄 신상품 출시 이벤트 안내</p>
+      <div className="rounded-2xl p-4 space-y-3" style={{background:"#FDFAF6", border:"1px solid #DDD5C8"}}>
+        <div className="rounded-xl p-3" style={{background:"#F5EFE6", border:"1px solid #DDD5C8"}}>
+          <p className="text-[10px] font-medium mb-1" style={{color:"#B0A49C"}}>오늘의 주제</p>
+          <p className="text-xs" style={{color:"#2C2420"}}>봄 신상품 출시 이벤트 안내</p>
         </div>
-        <div className="flex items-center gap-2 text-[10px] text-indigo-400">
-          <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
+        <div className="flex items-center gap-2 text-[10px]" style={{color:"#9B7FE8"}}>
+          <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{background:"#9B7FE8"}} />
           Claude AI 작성 중...
         </div>
-        <div className="rounded-lg bg-indigo-950/50 border border-indigo-900 p-3">
-          <p className="text-zinc-300 text-xs leading-relaxed">🌸 봄이 찾아왔습니다! 기다리고 기다리던 신상품이 드디어 출시됩니다. 이번 시즌 가장 트렌디한 컬러와 감각적인 디자인으로 여러분을 찾아갑니다...</p>
+        <div className="rounded-xl p-3" style={{background:"#FFF0F4", border:"1px solid #FFCDD9"}}>
+          <p className="text-xs leading-relaxed" style={{color:"#C2185B", opacity:0.85}}>
+            🌸 봄이 찾아왔습니다! 기다리고 기다리던 신상품이 드디어 출시됩니다...
+          </p>
           <div className="mt-2 flex flex-wrap gap-1">
             {["#봄신상", "#신제품출시", "#패션"].map(t => (
-              <span key={t} className="text-indigo-400 text-[9px]">{t}</span>
+              <span key={t} className="text-[9px]" style={{color:"#F472B6"}}>{t}</span>
             ))}
           </div>
         </div>
@@ -69,26 +66,26 @@ const features = [
   {
     eyebrow: "분석",
     title: "무엇이 잘 되고 있는지 한눈에",
-    desc: "플랫폼별 예약 현황, 월별 트렌드, 요일별 발행 패턴을 시각화해서 보여드려요. 데이터 기반으로 더 스마트한 콘텐츠 전략을 세우세요.",
+    desc: "플랫폼별 예약 현황, 월별 트렌드를 시각화해서 보여드려요. 데이터 기반으로 더 스마트한 콘텐츠 전략을 세우세요.",
     visual: (
-      <div className="rounded-xl bg-zinc-950 p-4">
-        <div className="flex items-end gap-1.5 h-20 mb-3">
-          {[40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 95, 65].map((h, i) => (
-            <div key={i} className="flex-1 rounded-sm" style={{height: `${h}%`, background: i === 10 ? "#6366f1" : `rgba(99,102,241,${0.2 + i * 0.04})`}} />
+      <div className="rounded-2xl p-4" style={{background:"#FDFAF6", border:"1px solid #DDD5C8"}}>
+        <p className="text-xs font-semibold mb-3" style={{color:"#7A6E67"}}>이번 달 기록</p>
+        <div className="flex items-end gap-1.5 h-16 mb-3">
+          {[35,55,40,70,45,80,60,75,50,85,65,90].map((h,i)=>(
+            <div key={i} className="flex-1 rounded-sm"
+              style={{height:`${h}%`, background: i===11?"#9B7FE8":`color-mix(in srgb, #9B7FE8 ${30+i*5}%, #F0EBFF)`}} />
           ))}
         </div>
-        <div className="flex justify-between text-[9px] text-zinc-600">
-          {["1월","3월","5월","7월","9월","11월"].map(m => <span key={m}>{m}</span>)}
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 mt-3">
           {[
-            {label:"Instagram", value:"11", color:"text-pink-400"},
-            {label:"Twitter", value:"9", color:"text-sky-400"},
-            {label:"YouTube", value:"4", color:"text-red-400"},
-          ].map(s => (
-            <div key={s.label} className="text-center">
-              <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-zinc-600 text-[9px]">{s.label}</p>
+            {emoji:"📸",label:"Instagram",value:"11",color:"#C2185B",bg:"#FFF0F4"},
+            {emoji:"🐦",label:"Twitter",value:"9",color:"#0D7A72",bg:"#EDFCFA"},
+            {emoji:"🎬",label:"YouTube",value:"4",color:"#C62828",bg:"#FFF3F3"},
+          ].map(s=>(
+            <div key={s.label} className="rounded-xl p-2 text-center" style={{background:s.bg}}>
+              <p className="text-base">{s.emoji}</p>
+              <p className="text-base font-bold" style={{color:s.color}}>{s.value}</p>
+              <p className="text-[9px]" style={{color:s.color, opacity:0.7}}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -101,49 +98,32 @@ const plans = [
   {
     name: "Free",
     price: "0",
-    desc: "개인 사용자를 위한 시작 플랜",
+    desc: "시작은 무료로",
     featured: false,
-    features: [
-      "Instagram, Twitter 2개 플랫폼",
-      "월 10개 포스트 예약",
-      "캘린더 뷰 (월·주·일)",
-      "기본 통계",
-    ],
+    features: ["Instagram, Twitter 2개 플랫폼","월 10개 포스트 예약","캘린더 뷰 (월·주·일)","기본 통계"],
     cta: "무료로 시작",
   },
   {
     name: "Pro",
     price: "9",
-    desc: "개인 크리에이터에게 딱 맞는 플랜",
+    desc: "크리에이터를 위한 플랜",
     featured: true,
-    features: [
-      "YouTube 포함 3개 플랫폼",
-      "월 100개 포스트 예약",
-      "AI 글쓰기 & 해시태그 추천",
-      "분석 대시보드",
-      "AI 최적 게시 시간",
-    ],
+    features: ["YouTube 포함 3개 플랫폼","월 100개 포스트 예약","AI 글쓰기 & 해시태그","분석 대시보드","AI 최적 게시 시간"],
     cta: "Pro 시작하기",
   },
   {
     name: "Business",
     price: "29",
-    desc: "팀이 함께 쓰는 브랜드 플랜",
+    desc: "팀과 함께",
     featured: false,
-    features: [
-      "무제한 플랫폼",
-      "무제한 포스트 예약",
-      "팀 협업 & 승인 워크플로우",
-      "전담 고객 지원",
-      "Pro 모든 기능 포함",
-    ],
+    features: ["무제한 플랫폼","무제한 포스트 예약","팀 협업 & 승인 워크플로우","전담 고객 지원","Pro 모든 기능"],
     cta: "팀으로 시작",
   },
 ];
 
 const testimonials = [
   {
-    quote: "일주일치 포스트를 한 번에 예약해두면 자동으로 올라가니까 정말 편해요. AI 글쓰기도 퀄리티가 생각보다 훨씬 높아요.",
+    quote: "일주일치 포스트를 한 번에 예약해두면 자동으로 올라가니까 정말 편해요. AI 글쓰기도 퀄리티가 높아서 놀랐어요.",
     name: "김지수",
     role: "패션 인플루언서",
   },
@@ -153,162 +133,128 @@ const testimonials = [
     role: "스타트업 마케터",
   },
   {
-    quote: "분석 대시보드에서 어떤 요일이 잘 되는지 보이니까 전략적으로 콘텐츠를 운영할 수 있게 됐어요.",
+    quote: "분석 대시보드에서 어떤 요일이 잘 되는지 보이니까 전략적으로 콘텐츠를 운영하게 됐어요.",
     name: "이수진",
     role: "뷰티 크리에이터",
   },
 ];
 
 const faqs = [
-  {
-    q: "무료 플랜에서 유료로 언제든 업그레이드할 수 있나요?",
-    a: "네, 언제든 업그레이드 가능해요. 즉시 추가 기능을 이용할 수 있고 기존 예약 포스트도 유지됩니다.",
-  },
-  {
-    q: "실제로 소셜 미디어에 자동으로 포스트가 올라가나요?",
-    a: "현재는 일정 예약 및 관리 기능을 제공하며, 자동 발행 기능은 순차적으로 추가 중입니다. Twitter/X 자동 발행이 먼저 지원될 예정이에요.",
-  },
-  {
-    q: "AI 글쓰기는 어떤 AI를 사용하나요?",
-    a: "Anthropic의 Claude AI를 사용해요. 플랫폼 특성에 맞는 글과 해시태그 추천, 최적 게시 시간도 AI가 분석해드려요.",
-  },
-  {
-    q: "구독을 취소하면 데이터가 삭제되나요?",
-    a: "취소해도 포스트 데이터는 삭제되지 않아요. 무료 플랜으로 다운그레이드되며 무료 한도 내에서 계속 사용 가능해요.",
-  },
-  {
-    q: "팀 기능은 몇 명까지 사용할 수 있나요?",
-    a: "Business 플랜에서 팀원 수 제한 없이 초대할 수 있어요. 각 팀원의 포스트 승인 워크플로우도 설정할 수 있어요.",
-  },
+  {q:"무료 플랜에서 유료로 언제든 업그레이드할 수 있나요?",a:"네, 언제든 업그레이드 가능해요. 즉시 추가 기능을 이용할 수 있고 기존 예약 포스트도 유지됩니다."},
+  {q:"실제로 소셜 미디어에 자동으로 포스트가 올라가나요?",a:"현재는 일정 예약 및 관리 기능을 제공하며, 자동 발행 기능은 순차적으로 추가 중입니다."},
+  {q:"AI 글쓰기는 어떤 AI를 사용하나요?",a:"Anthropic의 Claude AI를 사용해요. 플랫폼 특성에 맞는 글과 해시태그, 최적 게시 시간을 분석해드려요."},
+  {q:"구독을 취소하면 데이터가 삭제되나요?",a:"취소해도 포스트 데이터는 삭제되지 않아요. 무료 플랜으로 다운그레이드되며 계속 사용 가능해요."},
+  {q:"팀 기능은 몇 명까지 사용할 수 있나요?",a:"Business 플랜에서 팀원 수 제한 없이 초대할 수 있어요."},
 ];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{background:"#F5EFE6"}}>
 
-      {/* Navigation */}
-      <header className="fixed top-0 z-20 w-full">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-bold tracking-tight text-white mix-blend-difference">Postly</span>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-zinc-500">
-            <a href="#features" className="hover:text-zinc-900 transition-colors">기능</a>
-            <a href="#pricing" className="hover:text-zinc-900 transition-colors">가격</a>
-            <a href="#faq" className="hover:text-zinc-900 transition-colors">FAQ</a>
+      {/* Nav */}
+      <header className="sticky top-0 z-20 backdrop-blur-md" style={{background:"rgba(245,239,230,0.9)", borderBottom:"1px solid #DDD5C8"}}>
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 h-14">
+          <span className="text-base font-bold tracking-tight" style={{color:"#2C2420"}}>Postly ✦</span>
+          <nav className="hidden md:flex items-center gap-8 text-sm" style={{color:"#7A6E67"}}>
+            <a href="#features" className="hover:opacity-70 transition-opacity">기능</a>
+            <a href="#pricing" className="hover:opacity-70 transition-opacity">가격</a>
+            <a href="#faq" className="hover:opacity-70 transition-opacity">FAQ</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/auth" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors">
-              로그인
-            </Link>
-            <Link
-              href="/auth"
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 transition-colors"
-            >
+            <Link href="/auth" className="text-sm font-medium transition-opacity hover:opacity-70" style={{color:"#7A6E67"}}>로그인</Link>
+            <Link href="/auth" className="rounded-full px-5 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+              style={{background:"#9B7FE8"}}>
               무료 시작
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero — dark */}
-      <section
-        className="relative overflow-hidden bg-zinc-950 pt-32 pb-28 sm:pt-40 sm:pb-36"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      >
-        {/* Glow */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 60%)",
-          }}
-        />
+      {/* Hero */}
+      <section className="mx-auto max-w-4xl px-6 pt-20 pb-16 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium mb-8"
+          style={{background:"#F0EBFF", color:"#6D3FD1", border:"1px solid #D8CCFF"}}>
+          ✦ SNS 루틴 다이어리
+        </div>
+        <h1 className="text-5xl sm:text-6xl font-bold leading-tight mb-6" style={{color:"#2C2420", letterSpacing:"-0.02em"}}>
+          매일 기록하고<br />
+          <span style={{color:"#9B7FE8"}}>쌓아가는</span> SNS 루틴
+        </h1>
+        <p className="text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10" style={{color:"#7A6E67"}}>
+          Instagram, Twitter/X, YouTube 포스트를 캘린더 다이어리처럼 관리하세요.
+          <br className="hidden sm:block" />
+          AI가 글까지 써드려서 매일 꾸준히 올리는 게 훨씬 쉬워집니다.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/auth"
+            className="rounded-full px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+            style={{background:"#9B7FE8", boxShadow:"0 4px 20px rgba(155,127,232,0.35)"}}>
+            무료로 시작하기 →
+          </Link>
+          <Link href="/dashboard"
+            className="rounded-full px-8 py-3.5 text-sm font-semibold transition-colors hover:opacity-80"
+            style={{background:"#FDFAF6", color:"#2C2420", border:"1px solid #DDD5C8"}}>
+            데모 보기
+          </Link>
+        </div>
+        <p className="mt-4 text-xs" style={{color:"#B0A49C"}}>신용카드 없이 시작 · 무료 플랜 영구 제공 · 언제든 취소</p>
 
-        <div className="relative mx-auto max-w-4xl px-6 text-center">
-          <p className="mb-6 text-sm font-medium tracking-widest text-zinc-500 uppercase">
-            Instagram · Twitter/X · YouTube
-          </p>
-          <h1 className="text-5xl sm:text-7xl font-bold text-white tracking-tight leading-[1.06] mb-8">
-            소셜 콘텐츠,
-            <br />
-            <span className="text-zinc-400">더 스마트하게.</span>
-          </h1>
-          <p className="text-zinc-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-12">
-            세 개 플랫폼 포스트를 캘린더 하나로 예약하고 관리하세요.
-            <br className="hidden sm:block" />
-            AI가 글까지 써드려서 콘텐츠 제작이 훨씬 빠릅니다.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/auth"
-              className="rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-100 transition-colors shadow-lg shadow-white/5"
-            >
-              무료로 시작하기 →
-            </Link>
-            <Link
-              href="/dashboard"
-              className="rounded-xl border border-white/12 px-8 py-3.5 text-sm font-semibold text-zinc-300 hover:border-white/25 hover:text-white transition-colors"
-            >
-              데모 보기
-            </Link>
-          </div>
-          <p className="mt-5 text-xs text-zinc-600">신용카드 없이 시작 · 무료 플랜 영구 제공 · 언제든 취소</p>
-
-          {/* Dashboard preview */}
-          <div className="mt-20 rounded-2xl border border-white/8 bg-zinc-900 overflow-hidden shadow-2xl shadow-black/50 text-left">
-            {/* Titlebar */}
-            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-white/6 bg-zinc-900">
-              <div className="h-3 w-3 rounded-full bg-zinc-700" />
-              <div className="h-3 w-3 rounded-full bg-zinc-700" />
-              <div className="h-3 w-3 rounded-full bg-zinc-700" />
-              <div className="mx-auto flex items-center gap-2 rounded-md bg-zinc-800 px-4 py-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-zinc-600" />
-                <span className="text-[11px] text-zinc-500">postly.app/dashboard</span>
-              </div>
+        {/* App preview — diary style */}
+        <div className="mt-16 rounded-2xl overflow-hidden shadow-xl text-left" style={{background:"#FDFAF6", border:"1px solid #DDD5C8", boxShadow:"0 20px 60px rgba(155,127,232,0.12)"}}>
+          <div className="flex items-center gap-2 px-5 py-3" style={{borderBottom:"1px solid #E8E0D4", background:"#F5EFE6"}}>
+            <div className="h-3 w-3 rounded-full" style={{background:"#FFBDBD"}} />
+            <div className="h-3 w-3 rounded-full" style={{background:"#FFDA9E"}} />
+            <div className="h-3 w-3 rounded-full" style={{background:"#A8EEC1"}} />
+            <div className="mx-auto flex items-center gap-1.5 rounded-full px-4 py-1" style={{background:"#EDE4D8"}}>
+              <div className="h-1.5 w-1.5 rounded-full" style={{background:"#B0A49C"}} />
+              <span className="text-[11px]" style={{color:"#7A6E67"}}>postly.app/dashboard</span>
             </div>
-            {/* App UI */}
-            <div className="p-4 sm:p-6 grid grid-cols-4 gap-3">
+          </div>
+          <div className="p-5">
+            <div className="mb-4">
+              <p className="text-xs" style={{color:"#B0A49C"}}>✏️ 오늘도 하나씩 기록해봐요</p>
+              <p className="text-lg font-bold mt-0.5" style={{color:"#2C2420"}}>3월 19일 수요일</p>
+            </div>
+            <div className="grid grid-cols-5 gap-2 mb-4">
               {[
-                { label: "이번 달", value: "24", col: "text-indigo-400" },
-                { label: "오늘 예정", value: "3", col: "text-emerald-400" },
-                { label: "Instagram", value: "11", col: "text-pink-400" },
-                { label: "Twitter/X", value: "9", col: "text-sky-400" },
-              ].map((c) => (
-                <div key={c.label} className="rounded-xl bg-zinc-800/60 border border-white/5 p-3 sm:p-4 text-center">
-                  <p className={`text-xl sm:text-2xl font-bold ${c.col}`}>{c.value}</p>
-                  <p className="text-[11px] text-zinc-500 mt-0.5">{c.label}</p>
+                {emoji:"✍️",val:"24",label:"이번달",color:"#6D3FD1",bg:"#F0EBFF"},
+                {emoji:"📅",val:"3",label:"오늘예정",color:"#0D7A72",bg:"#EDFCFA"},
+                {emoji:"📸",val:"11",label:"Instagram",color:"#C2185B",bg:"#FFF0F4"},
+                {emoji:"🐦",val:"9",label:"Twitter",color:"#0D7A72",bg:"#EDFCFA"},
+                {emoji:"🎬",val:"4",label:"YouTube",color:"#C62828",bg:"#FFF3F3"},
+              ].map(c=>(
+                <div key={c.label} className="rounded-xl p-2.5 text-center" style={{background:c.bg}}>
+                  <p className="text-sm">{c.emoji}</p>
+                  <p className="text-base font-bold" style={{color:c.color}}>{c.val}</p>
+                  <p className="text-[9px]" style={{color:c.color,opacity:0.7}}>{c.label}</p>
                 </div>
               ))}
             </div>
-            <div className="px-4 sm:px-6 pb-6">
-              <div className="rounded-xl bg-zinc-800/40 border border-white/5 overflow-hidden">
-                <div className="grid grid-cols-7 border-b border-white/5">
-                  {["일","월","화","수","목","금","토"].map((d, i) => (
-                    <div key={d} className={`py-2 text-center text-[10px] font-medium ${i===0?"text-red-400":i===6?"text-blue-400":"text-zinc-600"}`}>{d}</div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7">
-                  {Array.from({length: 35}, (_, i) => {
-                    const day = i - 2;
-                    const isToday = i === 22;
-                    const hasPink = [4,11,18].includes(i);
-                    const hasSky = [6,13,27].includes(i);
-                    return (
-                      <div key={i} className={`min-h-[40px] sm:min-h-[52px] p-1.5 border-b border-r border-white/4 last:border-r-0 ${isToday ? "bg-indigo-600/20" : ""}`}>
-                        <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${isToday ? "bg-indigo-500 text-white font-bold" : day < 1 || day > 31 ? "text-zinc-700" : "text-zinc-400"}`}>
-                          {day > 0 && day <= 31 ? day : ""}
-                        </span>
+            <div className="rounded-xl overflow-hidden" style={{border:"1px solid #DDD5C8"}}>
+              <div className="grid grid-cols-7" style={{borderBottom:"1px solid #E8E0D4", background:"#F5EFE6"}}>
+                {["일","월","화","수","목","금","토"].map((d,i)=>(
+                  <div key={d} className="py-1.5 text-center text-[9px] font-semibold"
+                    style={{color:i===0?"#F472B6":i===6?"#60A5FA":"#B0A49C"}}>{d}</div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7">
+                {Array.from({length:35},(_,i)=>{
+                  const day=i-2; const isToday=i===20;
+                  const pink=[4,11,25].includes(i); const teal=[7,21,28].includes(i);
+                  return (
+                    <div key={i} className="min-h-[44px] p-1" style={{borderRight:i%7===6?"none":"1px solid #E8E0D4",borderBottom:"1px solid #E8E0D4", background:isToday?"#F0EBFF":"#FDFAF6"}}>
+                      <span className="text-[9px]" style={{color:isToday?"#9B7FE8":day<1||day>31?"#DDD5C8":"#2C2420",fontWeight:isToday?700:400}}>
+                        {day>0&&day<=31?day:""}
+                      </span>
+                      {day>0&&day<=31&&(
                         <div className="mt-0.5 flex flex-col gap-0.5">
-                          {hasPink && day > 0 && day <= 31 && <div className="hidden sm:block rounded-sm bg-pink-500/30 border border-pink-500/40 px-1 py-0.5 text-[8px] text-pink-400 truncate">Instagram</div>}
-                          {hasSky && day > 0 && day <= 31 && <div className="hidden sm:block rounded-sm bg-sky-500/20 border border-sky-500/30 px-1 py-0.5 text-[8px] text-sky-400 truncate">Twitter</div>}
+                          {pink&&<div className="rounded-sm px-1 py-px text-[7px]" style={{background:"#FFF0F4",color:"#C2185B"}}>📸 9:00</div>}
+                          {teal&&<div className="rounded-sm px-1 py-px text-[7px]" style={{background:"#EDFCFA",color:"#0D7A72"}}>🐦 14:00</div>}
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -316,28 +262,22 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-28">
+      <section id="features" className="py-24" style={{background:"#FDFAF6"}}>
         <div className="mx-auto max-w-5xl px-6">
-          <div className="mb-20 max-w-xl">
-            <p className="text-xs font-semibold tracking-widest text-indigo-600 uppercase mb-4">기능</p>
-            <h2 className="text-4xl font-bold text-zinc-900 tracking-tight">필요한 건 다 있어요</h2>
-            <p className="mt-4 text-zinc-500 text-base leading-relaxed">복잡한 설정 없이 바로 쓸 수 있어요.</p>
+          <div className="mb-16">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{color:"#9B7FE8"}}>기능</p>
+            <h2 className="text-3xl font-bold" style={{color:"#2C2420"}}>필요한 건 다 있어요</h2>
+            <p className="mt-3 text-base" style={{color:"#7A6E67"}}>복잡한 설정 없이 바로 쓸 수 있어요.</p>
           </div>
-
-          <div className="space-y-24">
+          <div className="space-y-20">
             {features.map((f, i) => (
-              <div
-                key={f.title}
-                className={`flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16 ${i % 2 === 1 ? "lg:flex-row-reverse" : ""}`}
-              >
+              <div key={f.title} className={`flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16 ${i%2===1?"lg:flex-row-reverse":""}`}>
                 <div className="flex-1">
-                  <p className="text-xs font-semibold tracking-widest text-indigo-500 uppercase mb-3">{f.eyebrow}</p>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight mb-4">{f.title}</h3>
-                  <p className="text-zinc-500 text-base leading-relaxed">{f.desc}</p>
+                  <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{color:"#9B7FE8"}}>{f.eyebrow}</p>
+                  <h3 className="text-2xl sm:text-3xl font-bold mb-4" style={{color:"#2C2420"}}>{f.title}</h3>
+                  <p className="text-base leading-relaxed" style={{color:"#7A6E67"}}>{f.desc}</p>
                 </div>
-                <div className="w-full lg:w-[420px] shrink-0">
-                  {f.visual}
-                </div>
+                <div className="w-full lg:w-[400px] shrink-0">{f.visual}</div>
               </div>
             ))}
           </div>
@@ -345,16 +285,16 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-zinc-950 py-24">
+      <section className="py-20" style={{background:"#F5EFE6"}}>
         <div className="mx-auto max-w-5xl px-6">
-          <p className="text-xs font-semibold tracking-widest text-zinc-500 uppercase mb-12">크리에이터들의 이야기</p>
+          <p className="text-xs font-semibold tracking-widest uppercase mb-12" style={{color:"#B0A49C"}}>크리에이터들의 이야기</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t) => (
-              <div key={t.name}>
-                <p className="text-zinc-300 text-sm leading-relaxed mb-6">&ldquo;{t.quote}&rdquo;</p>
+            {testimonials.map(t => (
+              <div key={t.name} className="rounded-2xl p-6" style={{background:"#FDFAF6", border:"1px solid #DDD5C8"}}>
+                <p className="text-sm leading-relaxed mb-5" style={{color:"#7A6E67"}}>&ldquo;{t.quote}&rdquo;</p>
                 <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-zinc-600 mt-0.5">{t.role}</p>
+                  <p className="text-sm font-semibold" style={{color:"#2C2420"}}>{t.name}</p>
+                  <p className="text-xs mt-0.5" style={{color:"#B0A49C"}}>{t.role}</p>
                 </div>
               </div>
             ))}
@@ -363,126 +303,100 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-28">
+      <section id="pricing" className="py-24" style={{background:"#FDFAF6"}}>
         <div className="mx-auto max-w-5xl px-6">
-          <div className="mb-16 text-center">
-            <p className="text-xs font-semibold tracking-widest text-indigo-600 uppercase mb-4">가격</p>
-            <h2 className="text-4xl font-bold text-zinc-900 tracking-tight">심플한 가격</h2>
-            <p className="mt-4 text-zinc-500">숨겨진 비용 없이 투명하게. 언제든 취소할 수 있어요.</p>
+          <div className="mb-14 text-center">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{color:"#9B7FE8"}}>가격</p>
+            <h2 className="text-3xl font-bold" style={{color:"#2C2420"}}>심플한 가격</h2>
+            <p className="mt-3" style={{color:"#7A6E67"}}>숨겨진 비용 없이 투명하게. 언제든 취소할 수 있어요.</p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative rounded-2xl p-7 ${
-                  plan.featured
-                    ? "bg-zinc-950 text-white"
-                    : "border border-zinc-200 bg-white"
-                }`}
-              >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {plans.map(plan => (
+              <div key={plan.name} className="relative rounded-2xl p-7"
+                style={plan.featured
+                  ? {background:"#9B7FE8", color:"white"}
+                  : {background:"#FDFAF6", border:"1px solid #DDD5C8"}}>
                 {plan.featured && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-indigo-500 px-3 py-1 text-[11px] font-semibold text-white">
-                    인기
-                  </span>
+                  <span className="absolute -top-3 left-6 rounded-full px-3 py-1 text-[11px] font-semibold text-white"
+                    style={{background:"#6D3FD1"}}>인기</span>
                 )}
-                <p className={`text-sm font-semibold mb-1 ${plan.featured ? "text-zinc-400" : "text-zinc-500"}`}>
-                  {plan.name}
-                </p>
+                <p className="text-sm font-semibold mb-1" style={{color:plan.featured?"rgba(255,255,255,0.7)":"#7A6E67"}}>{plan.name}</p>
                 <div className="flex items-end gap-1 mb-1">
-                  <span className={`text-4xl font-bold ${plan.featured ? "text-white" : "text-zinc-900"}`}>
-                    ${plan.price}
-                  </span>
-                  <span className={`text-sm mb-1 ${plan.featured ? "text-zinc-500" : "text-zinc-400"}`}>/월</span>
+                  <span className="text-4xl font-bold" style={{color:plan.featured?"white":"#2C2420"}}>${plan.price}</span>
+                  <span className="text-sm mb-1" style={{color:plan.featured?"rgba(255,255,255,0.5)":"#B0A49C"}}>/월</span>
                 </div>
-                <p className={`text-xs mb-7 ${plan.featured ? "text-zinc-600" : "text-zinc-400"}`}>{plan.desc}</p>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm">
-                      <svg
-                        className={`h-4 w-4 shrink-0 mt-0.5 ${plan.featured ? "text-indigo-400" : "text-indigo-500"}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                      <span className={plan.featured ? "text-zinc-300" : "text-zinc-600"}>{f}</span>
+                <p className="text-xs mb-6" style={{color:plan.featured?"rgba(255,255,255,0.55)":"#B0A49C"}}>{plan.desc}</p>
+                <ul className="space-y-2.5 mb-8">
+                  {plan.features.map(f => (
+                    <li key={f} className="flex items-start gap-2 text-sm">
+                      <span style={{color:plan.featured?"rgba(255,255,255,0.7)":"#9B7FE8"}}>✓</span>
+                      <span style={{color:plan.featured?"rgba(255,255,255,0.85)":"#7A6E67"}}>{f}</span>
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/auth"
-                  className={`block w-full rounded-xl py-2.5 text-center text-sm font-semibold transition-colors ${
-                    plan.featured
-                      ? "bg-indigo-500 text-white hover:bg-indigo-400"
-                      : "border border-zinc-200 text-zinc-700 hover:bg-zinc-50"
-                  }`}
-                >
+                <Link href="/auth" className="block w-full rounded-full py-2.5 text-center text-sm font-semibold transition-all hover:opacity-90"
+                  style={plan.featured
+                    ? {background:"white", color:"#6D3FD1"}
+                    : {background:"#F0EBFF", color:"#6D3FD1", border:"1px solid #D8CCFF"}}>
                   {plan.cta}
                 </Link>
               </div>
             ))}
           </div>
-          <p className="text-center mt-8 text-sm text-zinc-400">
+          <p className="text-center mt-8 text-sm" style={{color:"#B0A49C"}}>
             모든 플랜 30일 환불 보장 · 연간 결제 시 2개월 무료
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="border-t border-zinc-100 py-28">
+      <section id="faq" className="py-24" style={{background:"#F5EFE6", borderTop:"1px solid #DDD5C8"}}>
         <div className="mx-auto max-w-3xl px-6">
-          <div className="mb-16">
-            <p className="text-xs font-semibold tracking-widest text-indigo-600 uppercase mb-4">FAQ</p>
-            <h2 className="text-4xl font-bold text-zinc-900 tracking-tight">자주 묻는 질문</h2>
+          <div className="mb-14">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{color:"#9B7FE8"}}>FAQ</p>
+            <h2 className="text-3xl font-bold" style={{color:"#2C2420"}}>자주 묻는 질문</h2>
           </div>
-          <div className="divide-y divide-zinc-100">
-            {faqs.map((faq, i) => (
-              <div key={i} className="py-6">
-                <h3 className="text-sm font-semibold text-zinc-900 mb-2">{faq.q}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">{faq.a}</p>
+          <div style={{borderTop:"1px solid #DDD5C8"}}>
+            {faqs.map((faq,i) => (
+              <div key={i} className="py-6" style={{borderBottom:"1px solid #DDD5C8"}}>
+                <h3 className="text-sm font-semibold mb-2" style={{color:"#2C2420"}}>{faq.q}</h3>
+                <p className="text-sm leading-relaxed" style={{color:"#7A6E67"}}>{faq.a}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA — dark */}
-      <section className="bg-zinc-950 py-24">
+      {/* CTA */}
+      <section className="py-24" style={{background:"#9B7FE8"}}>
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="text-4xl font-bold text-white tracking-tight mb-5">지금 바로 시작하세요</h2>
-          <p className="text-zinc-500 mb-10 leading-relaxed">
-            무료로 가입하고 소셜 미디어 관리를 훨씬 쉽게 만들어보세요.
-            <br />
-            신용카드 없이도 시작할 수 있어요.
+          <h2 className="text-3xl font-bold text-white mb-4">지금 바로 시작하세요</h2>
+          <p className="mb-10 leading-relaxed" style={{color:"rgba(255,255,255,0.75)"}}>
+            무료로 가입하고 SNS 루틴을 만들어보세요.<br />신용카드 없이도 시작할 수 있어요.
           </p>
-          <Link
-            href="/auth"
-            className="inline-block rounded-xl bg-white px-10 py-4 text-sm font-semibold text-zinc-900 hover:bg-zinc-100 transition-colors"
-          >
+          <Link href="/auth" className="inline-block rounded-full px-10 py-4 text-sm font-semibold transition-colors hover:opacity-90"
+            style={{background:"white", color:"#6D3FD1"}}>
             무료로 시작하기 →
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-100 py-10">
-        <div className="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <footer className="py-10" style={{background:"#F5EFE6", borderTop:"1px solid #DDD5C8"}}>
+        <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <p className="font-bold text-zinc-900">Postly</p>
-            <p className="text-xs text-zinc-400 mt-1">소셜 미디어 스케줄러</p>
+            <p className="font-bold" style={{color:"#2C2420"}}>Postly ✦</p>
+            <p className="text-xs mt-1" style={{color:"#B0A49C"}}>SNS 루틴 다이어리</p>
           </div>
-          <nav className="flex flex-wrap gap-6 text-sm text-zinc-400">
-            <a href="#features" className="hover:text-zinc-600 transition-colors">기능</a>
-            <Link href="/pricing" className="hover:text-zinc-600 transition-colors">가격</Link>
-            <a href="#faq" className="hover:text-zinc-600 transition-colors">FAQ</a>
-            <Link href="/privacy" className="hover:text-zinc-600 transition-colors">개인정보처리방침</Link>
-            <Link href="/terms" className="hover:text-zinc-600 transition-colors">이용약관</Link>
+          <nav className="flex flex-wrap gap-6 text-sm" style={{color:"#B0A49C"}}>
+            <a href="#features" className="hover:opacity-70 transition-opacity">기능</a>
+            <Link href="/pricing" className="hover:opacity-70 transition-opacity">가격</Link>
+            <a href="#faq" className="hover:opacity-70 transition-opacity">FAQ</a>
+            <Link href="/privacy" className="hover:opacity-70 transition-opacity">개인정보처리방침</Link>
+            <Link href="/terms" className="hover:opacity-70 transition-opacity">이용약관</Link>
           </nav>
         </div>
-        <div className="mx-auto max-w-6xl px-6 mt-8 pt-6 border-t border-zinc-100 text-xs text-zinc-400">
+        <div className="mx-auto max-w-5xl px-6 mt-8 pt-6 text-xs" style={{borderTop:"1px solid #DDD5C8", color:"#B0A49C"}}>
           © 2026 Postly. All rights reserved.
         </div>
       </footer>
