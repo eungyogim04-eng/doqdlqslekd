@@ -97,7 +97,17 @@ export default function ApprovalsPage() {
               승인
               {pendingCount > 0 && <span className="bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5">{pendingCount}</span>}
             </Link>
+            <Link href="/settings" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:bg-zinc-100 transition-colors">설정</Link>
           </nav>
+          <div className="flex items-center gap-2">
+            {user && <span className="hidden sm:block text-xs text-zinc-400 truncate max-w-[140px]">{user.email}</span>}
+            <button
+              onClick={async () => { await supabase.auth.signOut(); router.push("/auth"); }}
+              className="rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </header>
 

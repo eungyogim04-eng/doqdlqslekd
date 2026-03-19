@@ -137,7 +137,18 @@ export default function TeamPage() {
             <Link href="/dashboard" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:bg-zinc-100 transition-colors">캘린더</Link>
             <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:bg-zinc-100 transition-colors">분석</Link>
             <Link href="/team" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 bg-indigo-50">팀</Link>
+            <Link href="/approvals" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:bg-zinc-100 transition-colors">승인</Link>
+            <Link href="/settings" className="rounded-lg px-3 py-1.5 text-zinc-500 hover:bg-zinc-100 transition-colors">설정</Link>
           </nav>
+          <div className="flex items-center gap-2">
+            {user && <span className="hidden sm:block text-xs text-zinc-400 truncate max-w-[140px]">{user.email}</span>}
+            <button
+              onClick={async () => { await supabase.auth.signOut(); router.push("/auth"); }}
+              className="rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </header>
 

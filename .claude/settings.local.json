@@ -19,7 +19,8 @@
       "Bash(npm install:*)",
       "Bash(git merge:*)",
       "Skill(claude-api)",
-      "Skill(claude-api:*)"
+      "Skill(claude-api:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

@@ -15,8 +15,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Postly — 소셜 미디어 스케줄러",
-  description: "Instagram, Twitter/X, YouTube 포스트를 쉽게 예약·관리하세요.",
+  description: "Instagram, Twitter/X, YouTube 포스트를 캘린더로 관리하고 AI로 자동 작성하세요. 크리에이터를 위한 가장 똑똑한 소셜 미디어 스케줄러.",
   manifest: "/manifest.json",
+  keywords: ["소셜 미디어 스케줄러", "SNS 예약", "인스타그램 예약", "트위터 예약", "AI 글쓰기", "콘텐츠 관리"],
+  openGraph: {
+    title: "Postly — 소셜 미디어 스케줄러",
+    description: "Instagram, Twitter/X, YouTube 포스트를 캘린더로 관리하고 AI로 자동 작성하세요.",
+    type: "website",
+    locale: "ko_KR",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -36,7 +36,13 @@ export default function Home() {
   const [showSearch, setShowSearch] = useState(false);
   const [calView, setCalView] = useState<"month" | "week" | "day">("month");
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "error" | "info" } | null>(null);
   const { dark, toggle: toggleDark } = useDarkMode();
+
+  function showToast(message: string, type: "error" | "info" = "error") {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }
 
   const PLAN_LIMITS = {
     free: { posts: 10, platforms: ["instagram", "twitter"] },
@@ -143,12 +149,12 @@ export default function Home() {
     const monthPosts = posts.filter((p) => p.scheduledAt.startsWith(thisMonth));
 
     if (monthPosts.length >= limit.posts) {
-      alert(`${userPlan === "free" ? "Free" : "Pro"} 플랜은 월 ${limit.posts}개까지 예약 가능합니다.\n업그레이드하려면 /pricing 페이지를 방문하세요!`);
+      showToast(`${userPlan === "free" ? "Free" : "Pro"} 플랜은 월 ${limit.posts}개까지 예약 가능합니다. 업그레이드하려면 가격 페이지를 방문하세요.`, "error");
       return;
     }
 
     if (!limit.platforms.includes(post.platform)) {
-      alert(`Free 플랜은 Instagram, Twitter만 사용 가능합니다.\nYouTube를 사용하려면 Pro 플랜으로 업그레이드하세요!`);
+      showToast("Free 플랜은 Instagram, Twitter만 사용 가능합니다. YouTube를 사용하려면 Pro 플랜으로 업그레이드하세요.", "error");
       return;
     }
 
@@ -268,7 +274,8 @@ export default function Home() {
             <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">분석</Link>
             <Link href="/team" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">팀</Link>
             <Link href="/approvals" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">승인</Link>
-            <Link href="/referral" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">친구초대</Link>
+                    <Link href="/referral" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">친구초대</Link>
+            <Link href="/settings" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">설정</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -530,6 +537,29 @@ export default function Home() {
             if (user) localStorage.setItem(`postly_onboarded_${user.id}`, "1");
           }}
         />
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl px-5 py-3.5 shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 ${
+          toast.type === "error"
+            ? "bg-red-600 text-white"
+            : "bg-zinc-900 text-white"
+        }`}>
+          {toast.type === "error" ? (
+            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          )}
+          <span>{toast.message}</span>
+          {toast.type === "error" && (
+            <a href="/pricing" className="ml-2 underline text-white/80 hover:text-white shrink-0">업그레이드 →</a>
+          )}
+        </div>
       )}
     </div>
   );

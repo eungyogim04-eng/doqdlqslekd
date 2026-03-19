@@ -71,14 +71,32 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
       {/* Header */}
-      <header className="flex items-center justify-between px-8 py-5 max-w-6xl mx-auto">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-indigo-600">
-          <span className="bg-indigo-600 text-white rounded-lg px-2 py-0.5 text-sm">P</span>
-          Postly
-        </Link>
-        <Link href="/dashboard" className="text-sm text-zinc-600 hover:text-zinc-900">
-          대시보드 →
-        </Link>
+      <header className="sticky top-0 z-10 border-b border-zinc-100 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+              <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+            <span className="text-base font-bold text-zinc-900">Postly</span>
+          </Link>
+          <nav className="flex items-center gap-4 text-sm text-zinc-500">
+            <Link href="/#features" className="hover:text-zinc-900 transition-colors">기능</Link>
+            <Link href="/#faq" className="hover:text-zinc-900 transition-colors">FAQ</Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors">
+              대시보드
+            </Link>
+            <Link href="/auth" className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+              무료 시작
+            </Link>
+          </div>
+        </div>
       </header>
 
       {/* Hero */}

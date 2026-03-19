@@ -147,14 +147,23 @@ export default function ReferralPage() {
       {/* Header */}
       <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+              <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
-            </Link>
-            <h1 className="text-base font-bold text-zinc-900 dark:text-zinc-100">친구 초대</h1>
+            </div>
+            <span className="text-base font-bold text-zinc-900 dark:text-zinc-100">Postly</span>
           </div>
+          <nav className="flex items-center gap-1 text-sm">
+            <Link href="/dashboard" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">캘린더</Link>
+            <Link href="/analytics" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">분석</Link>
+            <Link href="/referral" className="rounded-lg px-3 py-1.5 font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950">친구초대</Link>
+            <Link href="/settings" className="rounded-lg px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">설정</Link>
+          </nav>
         </div>
       </header>
 
