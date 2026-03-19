@@ -1,7 +1,128 @@
 @import "tailwindcss";
 
-body {
-  background: #f4f4f5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Diary color tokens ──────────────────────────────────── */
+:root {
+  --bg:          #F5EFE6;   /* warm cream — distinctly warm */
+  --bg-card:     #FDFAF6;   /* slightly off-white */
+  --bg-hover:    #EDE4D8;
+  --border:      #DDD5C8;
+  --border-light:#E8E0D4;
+
+  --text-1:      #2C2420;   /* warm dark brown */
+  --text-2:      #7A6E67;
+  --text-3:      #B0A49C;
+
+  --accent:      #9B7FE8;   /* soft lavender-purple */
+  --accent-bg:   #F0EBFF;
+  --accent-text: #6D3FD1;
+
+  /* Platform pastels */
+  --ig-bg:       #FFF0F4;
+  --ig-border:   #FFCDD9;
+  --ig-dot:      #F472B6;
+  --ig-text:     #C2185B;
+
+  --tw-bg:       #EDFCFA;
+  --tw-border:   #99EFE4;
+  --tw-dot:      #2DD4BF;
+  --tw-text:     #0D7A72;
+
+  --yt-bg:       #FFF3F3;
+  --yt-border:   #FFBDBD;
+  --yt-dot:      #F87171;
+  --yt-text:     #C62828;
 }
+
+.dark {
+  --bg:          #1E1916;
+  --bg-card:     #28231F;
+  --bg-hover:    #332D28;
+  --border:      #453D37;
+  --border-light:#3A342F;
+
+  --text-1:      #F5EFE6;
+  --text-2:      #A8998F;
+  --text-3:      #6E625A;
+
+  --accent:      #A78BFA;
+  --accent-bg:   #2A1F45;
+  --accent-text: #C4B5FD;
+
+  --ig-bg:       #3D1827;
+  --ig-border:   #7A2545;
+  --ig-dot:      #F472B6;
+  --ig-text:     #F9A8D4;
+
+  --tw-bg:       #0F2E2B;
+  --tw-border:   #0D4F48;
+  --tw-dot:      #2DD4BF;
+  --tw-text:     #5EEAD4;
+
+  --yt-bg:       #2D1313;
+  --yt-border:   #5B1F1F;
+  --yt-dot:      #F87171;
+  --yt-text:     #FCA5A5;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-sans), "Apple SD Gothic Neo", "Malgun Gothic",
+    -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.65;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* ── Diary utility classes ───────────────────────────────── */
+.diary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.diary-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--text-1);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.diary-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.diary-input::placeholder { color: var(--text-3); }
+
+/* Override Tailwind bg-white / bg-zinc that slip through */
+.bg-white { background-color: var(--bg-card) !important; }
+.bg-zinc-50, .bg-zinc-100 { background-color: var(--bg) !important; }
+
+/* ── Micro-animations ────────────────────────────────────── */
+@keyframes check-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.animate-check { animation: check-bounce 0.4s ease-out forwards; }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.25s ease-out; }

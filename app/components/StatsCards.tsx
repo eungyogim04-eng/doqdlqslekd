@@ -1,99 +1,73 @@
 "use client";
 
-import { ScheduledPost, PLATFORM_CONFIG } from "../types";
+import { ScheduledPost } from "../types";
 
 interface StatsCardsProps {
   posts: ScheduledPost[];
   today: string;
-  currentMonth: string; // YYYY-MM
+  currentMonth: string;
+  userPlan: "free" | "pro" | "business";
 }
 
-export default function StatsCards({
-  posts,
-  today,
-  currentMonth,
-}: StatsCardsProps) {
-  const monthPosts = posts.filter((p) =>
-    p.scheduledAt.startsWith(currentMonth)
-  );
-  const todayPosts = posts.filter((p) => p.scheduledAt === today);
+const PLAN_LIMITS = { free: 10, pro: 100, business: Infinity };
 
-  const platformCounts = (list: ScheduledPost[]) =>
-    (["instagram", "twitter", "youtube"] as const).map((platform) => ({
-      platform,
-      count: list.filter((p) => p.platform === platform).length,
-    }));
+export default function StatsCards({ posts, today, currentMonth, userPlan }: StatsCardsProps) {
+  const monthPosts = posts.filter((p) => p.scheduledAt.startsWith(currentMonth));
+  const todayPosts = posts.filter((p) => p.scheduledAt === today);
+  const instagramCount = monthPosts.filter((p) => p.platform === "instagram").length;
+  const twitterCount   = monthPosts.filter((p) => p.platform === "twitter").length;
+  const youtubeCount   = monthPosts.filter((p) => p.platform === "youtube").length;
+  const limit = PLAN_LIMITS[userPlan];
+  const usagePercent = limit === Infinity ? 0 : Math.min(100, (monthPosts.length / limit) * 100);
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5 mb-5">
       {/* This month */}
-      <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-          이번 달 예약
+      <div className="rounded-2xl p-4" style={{background:"var(--accent-bg)", border:"1px solid color-mix(in srgb, var(--accent) 20%, transparent)"}}>
+        <p className="text-xl mb-0.5">✍️</p>
+        <p className="text-2xl font-bold" style={{color:"var(--accent-text)"}}>{monthPosts.length}</p>
+        <p className="text-xs font-medium mt-0.5" style={{color:"var(--accent-text)", opacity:0.8}}>이번 달 기록</p>
+        <p className="text-[10px] mt-1" style={{color:"var(--accent-text)", opacity:0.55}}>
+          {limit === Infinity ? "무제한" : `${limit}개 중`}
         </p>
-        <p className="mt-1 text-4xl font-bold text-zinc-900">
-          {monthPosts.length}
-        </p>
-        <div className="mt-3 flex gap-2 flex-wrap">
-          {platformCounts(monthPosts).map(({ platform, count }) => (
-            <span
-              key={platform}
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${PLATFORM_CONFIG[platform].bg} ${PLATFORM_CONFIG[platform].color}`}
-            >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${PLATFORM_CONFIG[platform].dot}`}
-              />
-              {count}
-            </span>
-          ))}
-        </div>
+        {limit !== Infinity && (
+          <div className="mt-2 h-1 rounded-full overflow-hidden" style={{background:"color-mix(in srgb, var(--accent) 15%, transparent)"}}>
+            <div className="h-full rounded-full transition-all duration-500"
+              style={{width:`${usagePercent}%`, background: usagePercent > 85 ? "#F87171" : "var(--accent)"}} />
+          </div>
+        )}
       </div>
 
       {/* Today */}
-      <div className="col-span-2 sm:col-span-1 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-          오늘 예정
+      <div className="rounded-2xl p-4" style={{background:"#F0FDF9", border:"1px solid #A7F3D0"}}>
+        <p className="text-xl mb-0.5">📅</p>
+        <p className="text-2xl font-bold" style={{color:"#059669"}}>{todayPosts.length}</p>
+        <p className="text-xs font-medium mt-0.5" style={{color:"#059669", opacity:0.8}}>오늘 예정</p>
+        <p className="text-[10px] mt-1" style={{color:"#059669", opacity:0.6}}>
+          {todayPosts.length > 0 ? "오늘 파이팅 💪" : "아직 없어요"}
         </p>
-        <p className="mt-1 text-4xl font-bold text-zinc-900">
-          {todayPosts.length}
-        </p>
-        <div className="mt-3 flex gap-2 flex-wrap">
-          {platformCounts(todayPosts).map(({ platform, count }) =>
-            count > 0 ? (
-              <span
-                key={platform}
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${PLATFORM_CONFIG[platform].bg} ${PLATFORM_CONFIG[platform].color}`}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${PLATFORM_CONFIG[platform].dot}`}
-                />
-                {count}
-              </span>
-            ) : null
-          )}
-          {todayPosts.length === 0 && (
-            <span className="text-xs text-zinc-400">없음</span>
-          )}
-        </div>
       </div>
 
-      {/* Platform breakdown */}
-      {(["instagram", "twitter", "youtube"] as const).slice(0, 2).map((platform) => {
-        const cfg = PLATFORM_CONFIG[platform];
-        const count = posts.filter((p) => p.platform === platform).length;
-        return (
-          <div
-            key={platform}
-            className={`rounded-2xl border ${cfg.border} ${cfg.bg} p-5 shadow-sm`}
-          >
-            <p className={`text-xs font-medium uppercase tracking-wide ${cfg.color}`}>
-              {cfg.label}
-            </p>
-            <p className="mt-1 text-4xl font-bold text-zinc-900">{count}</p>
-            <p className="mt-3 text-xs text-zinc-500">전체 예약</p>
-          </div>
-        );
-      })}
+      {/* Instagram */}
+      <div className="rounded-2xl p-4" style={{background:"var(--ig-bg)", border:"1px solid var(--ig-border)"}}>
+        <p className="text-xl mb-0.5">📸</p>
+        <p className="text-2xl font-bold" style={{color:"var(--ig-text)"}}>{instagramCount}</p>
+        <p className="text-[11px] font-medium mt-0.5" style={{color:"var(--ig-text)", opacity:0.75}}>Instagram</p>
+      </div>
+
+      {/* Twitter */}
+      <div className="rounded-2xl p-4" style={{background:"var(--tw-bg)", border:"1px solid var(--tw-border)"}}>
+        <p className="text-xl mb-0.5">🐦</p>
+        <p className="text-2xl font-bold" style={{color:"var(--tw-text)"}}>{twitterCount}</p>
+        <p className="text-[11px] font-medium mt-0.5" style={{color:"var(--tw-text)", opacity:0.75}}>Twitter / X</p>
+      </div>
+
+      {/* YouTube */}
+      <div className="rounded-2xl p-4" style={{background:"var(--yt-bg)", border:"1px solid var(--yt-border)"}}>
+        <p className="text-xl mb-0.5">🎬</p>
+        <p className="text-2xl font-bold" style={{color:"var(--yt-text)"}}>{youtubeCount}</p>
+        <p className="text-[11px] font-medium mt-0.5" style={{color:"var(--yt-text)", opacity:0.75}}>YouTube</p>
+      </div>
     </div>
   );
 }
